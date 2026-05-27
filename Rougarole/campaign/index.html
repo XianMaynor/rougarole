@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign — Rougarole</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--surface:#0d0f1a;--surface2:#111425;--border:#2a2d45;--border-glow:#3d4170;
+  --text:#c8cce8;--text-dim:#6b7099;--text-bright:#e8ecff;--gold:#c9a84c;--gold-dim:#7a6430;
+  --gold-glow:rgba(201,168,76,.25);--anger:#cc2200;--anger-glow:#ff4422;--rune:#4a5080;--nav-h:64px;
+  --header-h:420px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%,rgba(200,204,232,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 35% 70%,rgba(200,204,232,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 60% 20%,rgba(200,204,232,.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 80% 55%,rgba(200,204,232,.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 92% 88%,rgba(200,204,232,.2) 0%,transparent 100%);
+}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(7,8,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:100;}
+nav::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);}
+.nav-brand{font-family:'Cinzel Decorative',serif;font-size:15px;color:var(--text-bright);letter-spacing:2px;text-decoration:none;display:flex;align-items:center;gap:10px;}
+.nav-brand .brand-rune{font-size:22px;opacity:.8;text-shadow:0 0 12px var(--anger-glow);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:7px 13px;border-radius:4px;border:1px solid transparent;transition:color .25s,border-color .25s,background .25s;}
+.nav-links a:hover{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.06);}
+.nav-mobile-btn{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px;}
+.nav-mobile-btn span{display:block;width:22px;height:1.5px;background:var(--text-dim);}
+.mobile-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:rgba(7,8,15,.97);border-bottom:1px solid var(--border);padding:20px 24px;z-index:99;flex-direction:column;gap:4px;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:12px 8px;border-bottom:1px solid var(--border);}
+.mobile-menu a:last-child{border-bottom:none;}
+.mobile-menu a:hover{color:var(--gold);}
+
+/* ── HERO ART HEADER ── */
+.hero-art{
+  position:relative;
+  width:100%;
+  height:var(--header-h);
+  margin-top:var(--nav-h);
+  overflow:hidden;
+  background:var(--surface);
+  z-index:1;
+}
+/* The actual image */
+.hero-art-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center center;
+  opacity:0;
+  transition:opacity .6s ease;
+}
+.hero-art-img.loaded{opacity:1;}
+/* Gradient overlays so text is always readable */
+.hero-art-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(0deg, var(--bg) 0%, rgba(7,8,15,.6) 35%, rgba(7,8,15,.15) 65%, rgba(7,8,15,.4) 100%),
+    linear-gradient(180deg, rgba(7,8,15,.5) 0%, transparent 20%);
+  z-index:2;
+}
+/* Placeholder when no art uploaded */
+.hero-art-placeholder{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;z-index:3;
+  opacity:1;transition:opacity .3s;
+}
+.hero-art.has-art .hero-art-placeholder{opacity:0;pointer-events:none;}
+.placeholder-icon{font-size:36px;opacity:.2;}
+.placeholder-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);opacity:.5;}
+
+/* Upload button — sits in top-right of hero */
+.hero-art-upload-btn{
+  position:absolute;top:16px;right:16px;z-index:10;
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-dim);background:rgba(7,8,15,.7);
+  border:1px solid var(--border-glow);padding:7px 14px;border-radius:4px;
+  cursor:pointer;backdrop-filter:blur(6px);
+  display:flex;align-items:center;gap:6px;
+  transition:color .2s,border-color .2s,background .2s;
+}
+.hero-art-upload-btn:hover{color:var(--gold);border-color:var(--gold-dim);background:rgba(7,8,15,.9);}
+.hero-art-upload-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
+
+/* Remove art button */
+.hero-art-remove-btn{
+  position:absolute;top:16px;right:130px;z-index:10;
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,68,34,.5);background:rgba(7,8,15,.7);
+  border:1px solid rgba(255,68,34,.2);padding:7px 14px;border-radius:4px;
+  cursor:pointer;backdrop-filter:blur(6px);
+  display:none;
+  transition:color .2s,border-color .2s;
+}
+.hero-art.has-art .hero-art-remove-btn{display:block;}
+.hero-art-remove-btn:hover{color:var(--anger-glow);border-color:rgba(255,68,34,.5);}
+
+/* Focal point drag hint */
+.focal-hint{
+  position:absolute;bottom:52px;right:16px;z-index:10;
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(200,204,232,.35);
+  display:none;
+}
+.hero-art.has-art .focal-hint{display:block;}
+
+/* ── PAGE HEADER (sits below art, overlapping slightly) ── */
+.page-header{
+  position:relative;z-index:1;
+  margin-top:-80px; /* pull up over the art gradient */
+  padding:0 40px 56px;
+  text-align:center;
+}
+.breadcrumb{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;}
+.breadcrumb a{color:var(--text-dim);text-decoration:none;transition:color .2s;}
+.breadcrumb a:hover{color:var(--gold);}
+.breadcrumb .sep{margin:0 8px;color:var(--rune);}
+.campaign-glyph-big{font-size:48px;display:block;margin-bottom:12px;filter:drop-shadow(0 0 16px var(--gold-glow));}
+.campaign-title{font-family:'Cinzel Decorative',serif;font-size:clamp(26px,5vw,54px);font-weight:900;color:var(--text-bright);letter-spacing:2px;line-height:1.1;margin-bottom:12px;text-shadow:0 2px 20px rgba(0,0,0,.8);}
+.campaign-subtitle{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.campaign-desc{font-size:17px;color:var(--text);font-style:italic;max-width:540px;margin:0 auto 28px;line-height:1.7;}
+
+/* Edit campaign button below desc */
+.btn-edit-campaign{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-dim);background:transparent;
+  border:1px solid var(--border-glow);padding:9px 22px;border-radius:4px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  transition:color .2s,border-color .2s,background .2s;
+}
+.btn-edit-campaign:hover{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.05);}
+
+/* ── RULE ── */
+.page-rule{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 40px;}
+.page-rule::before{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--border-glow),transparent);margin-bottom:64px;}
+
+/* ── SECTION GRID ── */
+.sections{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 40px 120px;}
+.sections-eyebrow{font-family:'Cinzel',serif;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:40px;}
+.section-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:36px 24px 28px;text-align:center;text-decoration:none;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease,border-color .3s,box-shadow .3s;}
+.section-card.visible{opacity:1;transform:translateY(0);}
+.section-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--card-accent,var(--gold-dim)),transparent);opacity:0;transition:opacity .3s;}
+.section-card:hover{border-color:var(--card-border,var(--border-glow));box-shadow:0 0 28px var(--card-shadow,rgba(61,65,112,.2));transform:translateY(-5px) !important;}
+.section-card:hover::before{opacity:1;}
+.section-card-icon{font-size:40px;margin-bottom:18px;filter:drop-shadow(0 0 10px var(--card-accent,var(--gold-dim)));transition:filter .3s;}
+.section-card:hover .section-card-icon{filter:drop-shadow(0 0 18px var(--card-accent,var(--gold)));}
+.section-card-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--text-bright);margin-bottom:10px;}
+.section-card-body{font-size:13px;color:var(--text-dim);font-style:italic;line-height:1.6;flex:1;}
+.section-card-cta{margin-top:20px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--card-accent,var(--gold));border:1px solid var(--card-accent,var(--gold-dim));padding:5px 14px;border-radius:12px;transition:background .2s;}
+.section-card:hover .section-card-cta{background:rgba(255,255,255,.05);}
+.card-characters{--card-accent:#ff4422;--card-border:rgba(255,68,34,.4);--card-shadow:rgba(204,34,0,.15);}
+.card-maps{--card-accent:#4488ff;--card-border:rgba(68,136,255,.35);--card-shadow:rgba(34,102,204,.15);}
+.card-lore{--card-accent:#c9a84c;--card-border:rgba(201,168,76,.4);--card-shadow:rgba(201,168,76,.12);}
+
+/* ── DANGER ZONE ── */
+.danger-zone{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 40px 80px;text-align:center;}
+.danger-zone hr{border:none;border-top:1px solid var(--border);margin-bottom:32px;}
+.btn-danger{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,68,34,.6);background:transparent;border:1px solid rgba(255,68,34,.2);padding:10px 22px;border-radius:4px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;}
+.btn-danger:hover{color:var(--anger-glow);border-color:rgba(255,68,34,.5);background:rgba(204,34,0,.06);}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:32px 40px;text-align:center;}
+footer::before{content:'';display:block;width:40%;height:1px;background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);margin:-32px auto 30px;}
+.footer-copy{font-size:12px;color:var(--rune);font-style:italic;}
+
+/* ── EDIT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,5,10,.85);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border-glow);border-radius:10px;width:100%;max-width:480px;position:relative;overflow:hidden;transform:translateY(20px) scale(.98);transition:transform .25s;max-height:90vh;overflow-y:auto;}
+.modal-overlay.open .modal{transform:translateY(0) scale(1);}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.modal-header{padding:28px 28px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.modal-title{font-family:'Cinzel Decorative',serif;font-size:20px;color:var(--text-bright);letter-spacing:1px;}
+.modal-close{position:absolute;top:18px;right:18px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-dim);width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;}
+.modal-close:hover{color:var(--text-bright);background:var(--surface2);}
+.modal-body{padding:24px 28px;}
+.field{margin-bottom:20px;}
+.field-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:7px;}
+.field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:11px 14px;font-family:'Crimson Pro',serif;font-size:15px;color:var(--text);outline:none;transition:border-color .25s;}
+.field-input:focus{border-color:var(--gold-dim);}
+.field-input::placeholder{color:var(--rune);}
+.field-textarea{resize:vertical;min-height:90px;}
+.modal-footer{padding:8px 28px 24px;display:flex;gap:10px;justify-content:flex-end;}
+.btn-cancel{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:11px 22px;border-radius:4px;cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-cancel:hover{border-color:var(--text-dim);color:var(--text);}
+.btn-submit{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);border:1px solid var(--gold);padding:11px 28px;border-radius:4px;cursor:pointer;transition:background .2s,box-shadow .2s;}
+.btn-submit:hover{background:#e0ba56;box-shadow:0 0 16px rgba(201,168,76,.35);}
+
+/* Glyph picker in modal */
+.glyph-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.glyph-opt{width:38px;height:38px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;}
+.glyph-opt:hover{border-color:var(--border-glow);}
+.glyph-opt.selected{border-color:var(--gold);background:rgba(201,168,76,.1);}
+
+/* ── IMAGE POSITION MODAL ── */
+.img-modal-overlay{position:fixed;inset:0;background:rgba(4,5,10,.92);backdrop-filter:blur(8px);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.img-modal-overlay.open{opacity:1;pointer-events:all;}
+.img-modal-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.img-preview-wrap{
+  position:relative;width:100%;max-width:800px;
+  aspect-ratio:21/9;overflow:hidden;
+  border:1px solid var(--border-glow);border-radius:8px;
+  cursor:crosshair;
+  background:var(--surface2);
+}
+.img-preview{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;pointer-events:none;user-select:none;}
+.focal-crosshair{
+  position:absolute;width:24px;height:24px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;z-index:2;
+}
+.focal-crosshair::before,.focal-crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.8);}
+.focal-crosshair::before{width:1px;height:100%;left:50%;transform:translateX(-50%);}
+.focal-crosshair::after{height:1px;width:100%;top:50%;transform:translateY(-50%);}
+.img-modal-hint{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);text-align:center;}
+.img-modal-actions{display:flex;gap:12px;}
+
+@media(max-width:780px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .nav-mobile-btn{display:flex;}
+  .page-header,.page-rule,.sections,.danger-zone{padding-left:20px;padding-right:20px;}
+  .section-grid{grid-template-columns:1fr;max-width:360px;margin:0 auto;}
+  :root{--header-h:260px;}
+  .hero-art-remove-btn{right:16px;top:48px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../" class="nav-brand"><span class="brand-rune">⚔</span>Rougarole</a>
+  <ul class="nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../characters/">Characters</a></li>
+  </ul>
+  <button class="nav-mobile-btn" id="mobileBtn"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../">Home</a>
+  <a href="../characters/">Characters</a>
+</div>
+
+<!-- HERO ART -->
+<div class="hero-art" id="heroArt">
+  <img class="hero-art-img" id="heroArtImg" src="" alt="">
+  <div class="hero-art-overlay"></div>
+  <div class="hero-art-placeholder">
+    <span class="placeholder-icon">🖼</span>
+    <span class="placeholder-label">Upload campaign art</span>
+  </div>
+  <button class="hero-art-upload-btn" id="uploadArtBtn">
+    🖼 Upload Art
+    <input type="file" id="artFileInput" accept="image/*">
+  </button>
+  <button class="hero-art-remove-btn" id="removeArtBtn">✕ Remove</button>
+  <span class="focal-hint">Click image to reposition</span>
+</div>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+  <p class="breadcrumb"><a href="../">Rougarole</a><span class="sep">›</span><span id="breadcrumbName">Campaign</span></p>
+  <span class="campaign-glyph-big" id="campGlyph">⚔</span>
+  <h1 class="campaign-title" id="campTitle">Loading…</h1>
+  <p class="campaign-subtitle">Campaign Archive</p>
+  <p class="campaign-desc" id="campDesc"></p>
+  <button class="btn-edit-campaign" id="editCampaignBtn">✏ Edit Campaign</button>
+</header>
+
+<div class="page-rule"></div>
+
+<!-- SECTION CARDS -->
+<section class="sections">
+  <p class="sections-eyebrow">Browse this Campaign</p>
+  <div class="section-grid">
+    <a class="section-card card-characters" id="linkCharacters" href="#">
+      <span class="section-card-icon">⚔</span>
+      <div class="section-card-title">Characters</div>
+      <div class="section-card-body">All known agents, wanderers, and named souls who walk within this campaign.</div>
+      <span class="section-card-cta">View Roster →</span>
+    </a>
+    <a class="section-card card-maps" id="linkMaps" href="#">
+      <span class="section-card-icon">🗺</span>
+      <div class="section-card-title">Maps</div>
+      <div class="section-card-body">Charted territories, borders, and the unmapped reaches belonging to this campaign.</div>
+      <span class="section-card-cta">Open Atlas →</span>
+    </a>
+    <a class="section-card card-lore" id="linkLore" href="#">
+      <span class="section-card-icon">📜</span>
+      <div class="section-card-title">Lore Books</div>
+      <div class="section-card-body">Histories, myths, and recovered texts that belong to the world of this campaign.</div>
+      <span class="section-card-cta">Read Lore →</span>
+    </a>
+  </div>
+</section>
+
+<div class="danger-zone">
+  <hr>
+  <button class="btn-danger" id="deleteCampaign">Delete this Campaign</button>
+</div>
+
+<footer>
+  <p class="footer-copy">Archives of the Whittington Guard &bull; All records are living documents.</p>
+</footer>
+
+<!-- EDIT CAMPAIGN MODAL -->
+<div class="modal-overlay" id="editOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <p class="modal-eyebrow">Edit Entry</p>
+      <h2 class="modal-title">Edit Campaign</h2>
+      <button class="modal-close" id="editClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="editName">Campaign Name</label>
+        <input class="field-input" type="text" id="editName" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label" for="editDesc">Description</label>
+        <textarea class="field-input field-textarea" id="editDesc"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Icon</label>
+        <div class="glyph-picker" id="editGlyphPicker"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="editCancel">Cancel</button>
+      <button class="btn-submit" id="editSave">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE POSITION MODAL -->
+<div class="img-modal-overlay" id="imgPosOverlay">
+  <p class="img-modal-title">Click to set focal point</p>
+  <div class="img-preview-wrap" id="imgPreviewWrap">
+    <img class="img-preview" id="imgPreview" src="" alt="">
+    <div class="focal-crosshair" id="focalCrosshair" style="left:50%;top:50%;"></div>
+  </div>
+  <p class="img-modal-hint">Click anywhere on the image to choose what stays in frame</p>
+  <div class="img-modal-actions">
+    <button class="btn-cancel" id="imgPosCancel">Cancel</button>
+    <button class="btn-submit" id="imgPosConfirm">Apply</button>
+  </div>
+</div>
+
+<script>
+const CAMPAIGNS_KEY = 'rougarole_campaigns';
+const GLYPHS = ['⚔','🜂','✦','🌙','🔮','🗡','⚜','🜁','🐉','📜','🗺','💠','⏳','🌋','🏰','☽'];
+
+function loadCampaigns(){ try{ return JSON.parse(localStorage.getItem(CAMPAIGNS_KEY))||[]; }catch{ return []; } }
+function saveCampaigns(c){ localStorage.setItem(CAMPAIGNS_KEY, JSON.stringify(c)); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── LOAD CAMPAIGN
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+let campaigns = loadCampaigns();
+let campaign = campaigns.find(c => c.id === id);
+
+function applyToPage(c){
+  document.title = c.name + ' — Rougarole';
+  document.getElementById('campGlyph').textContent = c.glyph || '⚔';
+  document.getElementById('campTitle').textContent = c.name;
+  document.getElementById('breadcrumbName').textContent = c.name;
+  document.getElementById('campDesc').textContent = c.desc || '';
+  const enc = encodeURIComponent(c.name);
+  document.getElementById('linkCharacters').href = '../characters/?campaign=' + enc;
+  document.getElementById('linkMaps').href = '../maps/?campaign=' + enc;
+  document.getElementById('linkLore').href = '../lore/?campaign=' + enc;
+  // Restore saved art
+  if(c.artData){
+    const img = document.getElementById('heroArtImg');
+    img.src = c.artData;
+    img.style.objectPosition = (c.artFocalX||50) + '% ' + (c.artFocalY||50) + '%';
+    img.onload = () => img.classList.add('loaded');
+    if(img.complete) img.classList.add('loaded');
+    document.getElementById('heroArt').classList.add('has-art');
+  }
+}
+
+if(!campaign){
+  document.getElementById('campTitle').textContent = 'Campaign Not Found';
+  document.getElementById('campDesc').textContent = 'This campaign may have been deleted or the link is invalid.';
+  document.getElementById('editCampaignBtn').style.display = 'none';
+} else {
+  applyToPage(campaign);
+}
+
+// ── EDIT MODAL
+const editOverlay = document.getElementById('editOverlay');
+let editSelectedGlyph = campaign?.glyph || GLYPHS[0];
+
+function buildGlyphPicker(current){
+  const picker = document.getElementById('editGlyphPicker');
+  picker.innerHTML = '';
+  GLYPHS.forEach(g => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'glyph-opt' + (g === current ? ' selected' : '');
+    btn.textContent = g;
+    btn.addEventListener('click', () => {
+      picker.querySelectorAll('.glyph-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      editSelectedGlyph = g;
+    });
+    picker.appendChild(btn);
+  });
+  editSelectedGlyph = current;
+}
+
+function openEditModal(){
+  if(!campaign) return;
+  document.getElementById('editName').value = campaign.name;
+  document.getElementById('editDesc').value = campaign.desc || '';
+  buildGlyphPicker(campaign.glyph || GLYPHS[0]);
+  editOverlay.classList.add('open');
+  document.getElementById('editName').focus();
+}
+function closeEditModal(){
+  editOverlay.classList.remove('open');
+}
+
+document.getElementById('editCampaignBtn').addEventListener('click', openEditModal);
+document.getElementById('editClose').addEventListener('click', closeEditModal);
+document.getElementById('editCancel').addEventListener('click', closeEditModal);
+editOverlay.addEventListener('click', e => { if(e.target === editOverlay) closeEditModal(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeEditModal(); closeImgModal(); } });
+
+document.getElementById('editSave').addEventListener('click', () => {
+  const name = document.getElementById('editName').value.trim();
+  const desc = document.getElementById('editDesc').value.trim();
+  if(!name){ document.getElementById('editName').focus(); return; }
+  campaigns = loadCampaigns();
+  const idx = campaigns.findIndex(c => c.id === id);
+  if(idx === -1) return;
+  campaigns[idx].name = name;
+  campaigns[idx].desc = desc;
+  campaigns[idx].glyph = editSelectedGlyph;
+  saveCampaigns(campaigns);
+  campaign = campaigns[idx];
+  applyToPage(campaign);
+  closeEditModal();
+});
+
+// ── ART UPLOAD
+const artFileInput = document.getElementById('artFileInput');
+const heroArt = document.getElementById('heroArt');
+const heroArtImg = document.getElementById('heroArtImg');
+
+let pendingArtDataURL = null;
+let pendingFocalX = 50;
+let pendingFocalY = 50;
+
+artFileInput.addEventListener('change', () => {
+  const file = artFileInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingArtDataURL = e.target.result;
+    pendingFocalX = 50; pendingFocalY = 50;
+    openImgModal(pendingArtDataURL, pendingFocalX, pendingFocalY);
+  };
+  reader.readAsDataURL(file);
+  artFileInput.value = ''; // reset so same file can be re-uploaded
+});
+
+document.getElementById('removeArtBtn').addEventListener('click', () => {
+  if(!confirm('Remove the campaign art?')) return;
+  heroArtImg.src = '';
+  heroArtImg.classList.remove('loaded');
+  heroArt.classList.remove('has-art');
+  if(campaign){
+    campaigns = loadCampaigns();
+    const idx = campaigns.findIndex(c => c.id === id);
+    if(idx !== -1){ delete campaigns[idx].artData; delete campaigns[idx].artFocalX; delete campaigns[idx].artFocalY; saveCampaigns(campaigns); campaign = campaigns[idx]; }
+  }
+});
+
+// ── IMAGE POSITION MODAL
+const imgPosOverlay = document.getElementById('imgPosOverlay');
+const imgPreview = document.getElementById('imgPreview');
+const imgPreviewWrap = document.getElementById('imgPreviewWrap');
+const focalCrosshair = document.getElementById('focalCrosshair');
+
+function openImgModal(src, fx, fy){
+  imgPreview.src = src;
+  imgPreview.style.objectPosition = fx + '% ' + fy + '%';
+  focalCrosshair.style.left = fx + '%';
+  focalCrosshair.style.top = fy + '%';
+  pendingFocalX = fx; pendingFocalY = fy;
+  imgPosOverlay.classList.add('open');
+}
+function closeImgModal(){
+  imgPosOverlay.classList.remove('open');
+}
+
+imgPreviewWrap.addEventListener('click', e => {
+  const rect = imgPreviewWrap.getBoundingClientRect();
+  const fx = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+  const fy = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+  pendingFocalX = fx; pendingFocalY = fy;
+  focalCrosshair.style.left = fx + '%';
+  focalCrosshair.style.top = fy + '%';
+  imgPreview.style.objectPosition = fx + '% ' + fy + '%';
+});
+
+document.getElementById('imgPosCancel').addEventListener('click', closeImgModal);
+
+document.getElementById('imgPosConfirm').addEventListener('click', () => {
+  if(!pendingArtDataURL){ closeImgModal(); return; }
+  // Apply to hero
+  heroArtImg.src = pendingArtDataURL;
+  heroArtImg.style.objectPosition = pendingFocalX + '% ' + pendingFocalY + '%';
+  heroArtImg.classList.remove('loaded');
+  heroArtImg.onload = () => heroArtImg.classList.add('loaded');
+  if(heroArtImg.complete) heroArtImg.classList.add('loaded');
+  heroArt.classList.add('has-art');
+  // Persist
+  if(campaign){
+    campaigns = loadCampaigns();
+    const idx = campaigns.findIndex(c => c.id === id);
+    if(idx !== -1){
+      try {
+        campaigns[idx].artData = pendingArtDataURL;
+        campaigns[idx].artFocalX = pendingFocalX;
+        campaigns[idx].artFocalY = pendingFocalY;
+        saveCampaigns(campaigns);
+        campaign = campaigns[idx];
+      } catch(err){
+        // Image too large for localStorage — show it this session only
+        console.warn('Art too large for localStorage, showing in-session only:', err);
+        alert('Image displayed, but was too large to save permanently. Try a smaller or more compressed image to persist it across sessions.');
+      }
+    }
+  }
+  closeImgModal();
+});
+
+// Allow clicking hero to reposition if art already set
+heroArtImg.addEventListener('click', () => {
+  if(!heroArt.classList.contains('has-art')) return;
+  pendingArtDataURL = heroArtImg.src;
+  openImgModal(pendingArtDataURL, campaign?.artFocalX||50, campaign?.artFocalY||50);
+});
+heroArtImg.style.cursor = 'pointer';
+
+// ── DELETE
+document.getElementById('deleteCampaign').addEventListener('click', () => {
+  if(!campaign) return;
+  if(!confirm('Delete "' + campaign.name + '"? This cannot be undone.')) return;
+  saveCampaigns(loadCampaigns().filter(c => c.id !== id));
+  window.location.href = '../';
+});
+
+// ── MOBILE NAV
+document.getElementById('mobileBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+
+// ── SCROLL REVEAL
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const siblings = [...entry.target.parentElement.children];
+      const idx = siblings.indexOf(entry.target);
+      setTimeout(() => entry.target.classList.add('visible'), idx * 100);
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll('.section-card').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

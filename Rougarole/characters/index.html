@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Characters — Rougarole</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07080f;
+  --surface:#0d0f1a;
+  --surface2:#111425;
+  --border:#2a2d45;
+  --border-glow:#3d4170;
+  --text:#c8cce8;
+  --text-dim:#6b7099;
+  --text-bright:#e8ecff;
+  --gold:#c9a84c;
+  --gold-dim:#7a6430;
+  --gold-glow:rgba(201,168,76,.25);
+  --anger:#cc2200;
+  --anger-glow:#ff4422;
+  --rune:#4a5080;
+  --nav-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Crimson Pro',serif;font-size:16px;
+  min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    radial-gradient(1px 1px at  7% 12%,rgba(200,204,232,.45) 0%,transparent 100%),
+    radial-gradient(1px 1px at 18% 55%,rgba(200,204,232,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 28%  8%,rgba(200,204,232,.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 38% 72%,rgba(200,204,232,.20) 0%,transparent 100%),
+    radial-gradient(1px 1px at 50% 30%,rgba(200,204,232,.40) 0%,transparent 100%),
+    radial-gradient(1px 1px at 62% 88%,rgba(200,204,232,.30) 0%,transparent 100%),
+    radial-gradient(1px 1px at 72% 18%,rgba(200,204,232,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 83% 46%,rgba(200,204,232,.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 95% 10%,rgba(200,204,232,.45) 0%,transparent 100%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(7,8,15,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;z-index:100;
+}
+nav::after{
+  content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+  width:50%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);
+}
+.nav-brand{
+  font-family:'Cinzel Decorative',serif;font-size:15px;
+  color:var(--text-bright);letter-spacing:2px;text-decoration:none;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-brand .brand-rune{font-size:22px;opacity:.8;text-shadow:0 0 12px var(--anger-glow);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{
+  font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--text-dim);text-decoration:none;
+  padding:7px 13px;border-radius:4px;border:1px solid transparent;
+  transition:color .25s,border-color .25s,background .25s;
+}
+.nav-links a:hover,.nav-links a.active{
+  color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.06);
+}
+.nav-mobile-btn{
+  display:none;background:none;border:none;cursor:pointer;
+  flex-direction:column;gap:5px;padding:4px;
+}
+.nav-mobile-btn span{display:block;width:22px;height:1.5px;background:var(--text-dim);transition:background .2s;}
+.nav-mobile-btn:hover span{background:var(--gold);}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  position:relative;z-index:1;
+  padding:calc(var(--nav-h) + 56px) 40px 48px;
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;
+}
+.page-header-text{}
+.page-eyebrow{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:5px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:10px;
+}
+.page-eyebrow a{
+  color:var(--text-dim);text-decoration:none;transition:color .2s;
+}
+.page-eyebrow a:hover{color:var(--gold);}
+.page-eyebrow .sep{color:var(--rune);margin:0 8px;}
+.page-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(24px,4vw,42px);font-weight:900;
+  color:var(--text-bright);letter-spacing:2px;line-height:1.1;
+  margin-bottom:8px;
+}
+.page-desc{
+  font-size:15px;color:var(--text-dim);font-style:italic;
+  max-width:480px;line-height:1.6;
+}
+
+/* ── ADD BUTTON ── */
+.btn-new{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--bg);
+  background:var(--gold);border:1px solid var(--gold);
+  padding:13px 28px;border-radius:4px;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:background .25s,box-shadow .25s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-new:hover{background:#e0ba56;box-shadow:0 0 20px rgba(201,168,76,.4);}
+.btn-new .plus{font-size:16px;font-family:'Crimson Pro',serif;font-weight:300;}
+
+/* ── DIVIDER ── */
+.header-rule{
+  position:relative;z-index:1;
+  max-width:1200px;margin:0 auto;padding:0 40px;
+}
+.header-rule hr{
+  border:none;border-top:1px solid var(--border-glow);margin-bottom:40px;
+}
+
+/* ── FILTERS ── */
+.filters{
+  position:relative;z-index:1;
+  max-width:1200px;margin:0 auto;
+  padding:0 40px 28px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.search-wrap{
+  position:relative;flex:1;min-width:180px;max-width:320px;
+}
+.search-wrap input{
+  width:100%;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px;padding:9px 14px 9px 36px;
+  font-family:'Crimson Pro',serif;font-size:14px;
+  color:var(--text);outline:none;
+  transition:border-color .25s;
+}
+.search-wrap input::placeholder{color:var(--text-dim);}
+.search-wrap input:focus{border-color:var(--border-glow);}
+.search-icon{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  font-size:13px;color:var(--text-dim);pointer-events:none;
+}
+.filter-select{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px;padding:9px 14px;
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text-dim);
+  outline:none;cursor:pointer;
+  transition:border-color .25s;
+}
+.filter-select:focus{border-color:var(--border-glow);}
+.results-count{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--rune);
+  margin-left:auto;
+}
+
+/* ── GRID ── */
+.roster{
+  position:relative;z-index:1;
+  max-width:1200px;margin:0 auto;
+  padding:0 40px 100px;
+}
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+}
+
+/* ── CHARACTER CARD ── */
+.char-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:border-color .3s,box-shadow .3s,transform .3s;
+  opacity:0;transform:translateY(16px);
+}
+.char-card.visible{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease,border-color .3s,box-shadow .3s;}
+.char-card:hover{
+  border-color:rgba(255,68,34,.4);
+  box-shadow:0 0 24px rgba(204,34,0,.12);
+  transform:translateY(-3px);
+}
+.card-top{
+  padding:22px 22px 16px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.card-top::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.char-card:hover .card-top::before{opacity:1;}
+.card-glyph{
+  font-size:28px;margin-bottom:10px;display:block;
+  filter:drop-shadow(0 0 6px rgba(255,68,34,.3));
+}
+.card-name{
+  font-family:'Cinzel Decorative',serif;font-size:15px;
+  color:var(--text-bright);letter-spacing:1px;
+  margin-bottom:4px;line-height:1.2;
+}
+.card-meta{
+  display:flex;flex-direction:column;gap:3px;
+  margin-top:10px;
+}
+.meta-row{
+  display:flex;align-items:baseline;gap:7px;
+}
+.meta-label{
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text-dim);
+  flex-shrink:0;width:68px;
+}
+.meta-val{
+  font-size:13px;color:var(--text);font-style:italic;
+}
+.card-bottom{
+  padding:14px 22px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:auto;
+}
+.card-sheet-link{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold);text-decoration:none;
+  border:1px solid var(--gold-dim);padding:6px 14px;border-radius:3px;
+  transition:background .2s,border-color .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.card-sheet-link:hover{background:rgba(201,168,76,.08);border-color:var(--gold);}
+.card-delete{
+  background:none;border:none;cursor:pointer;
+  font-size:14px;color:var(--text-dim);padding:6px;
+  border-radius:3px;transition:color .2s,background .2s;
+  opacity:.5;
+}
+.card-delete:hover{color:var(--anger-glow);background:rgba(204,34,0,.08);opacity:1;}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;padding:80px 20px;
+}
+.empty-icon{font-size:48px;margin-bottom:20px;opacity:.3;display:block;}
+.empty-title{
+  font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;
+}
+.empty-body{font-size:14px;color:var(--rune);font-style:italic;}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(4,5,10,.85);
+  backdrop-filter:blur(6px);
+  z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border-glow);
+  border-radius:10px;
+  width:100%;max-width:480px;
+  position:relative;overflow:hidden;
+  transform:translateY(20px) scale(.98);
+  transition:transform .25s;
+}
+.modal-overlay.open .modal{transform:translateY(0) scale(1);}
+.modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);
+}
+.modal-header{
+  padding:28px 28px 20px;
+  border-bottom:1px solid var(--border);
+}
+.modal-eyebrow{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--anger-glow);margin-bottom:8px;
+}
+.modal-title{
+  font-family:'Cinzel Decorative',serif;font-size:20px;
+  color:var(--text-bright);letter-spacing:1px;
+}
+.modal-body{padding:24px 28px;}
+.modal-close{
+  position:absolute;top:18px;right:18px;
+  background:none;border:none;cursor:pointer;
+  font-size:18px;color:var(--text-dim);
+  width:32px;height:32px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:color .2s,background .2s;
+}
+.modal-close:hover{color:var(--text-bright);background:var(--surface2);}
+
+/* ── FORM ── */
+.field{margin-bottom:20px;}
+.field-label{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);
+  display:block;margin-bottom:7px;
+}
+.field-input{
+  width:100%;background:var(--surface2);
+  border:1px solid var(--border);border-radius:4px;
+  padding:11px 14px;
+  font-family:'Crimson Pro',serif;font-size:15px;color:var(--text);
+  outline:none;transition:border-color .25s;
+}
+.field-input:focus{border-color:var(--gold-dim);}
+.field-input::placeholder{color:var(--rune);}
+
+/* File upload */
+.file-drop{
+  width:100%;background:var(--surface2);
+  border:1px dashed var(--border-glow);border-radius:4px;
+  padding:28px 14px;text-align:center;cursor:pointer;
+  transition:border-color .25s,background .25s;
+  position:relative;
+}
+.file-drop:hover,.file-drop.dragover{
+  border-color:var(--gold-dim);background:rgba(201,168,76,.04);
+}
+.file-drop input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;
+}
+.file-drop-icon{font-size:24px;display:block;margin-bottom:8px;opacity:.5;}
+.file-drop-label{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text-dim);
+}
+.file-drop-name{
+  font-size:13px;color:var(--gold);font-style:italic;
+  margin-top:6px;display:none;
+}
+.file-drop.has-file .file-drop-name{display:block;}
+.file-drop.has-file .file-drop-label{color:var(--text-dim);}
+.file-drop.file-error{border-color:rgba(255,68,34,.5);}
+
+.field-hint{font-size:12px;color:var(--rune);font-style:italic;margin-top:5px;}
+
+.modal-footer{
+  padding:16px 28px 24px;
+  display:flex;gap:10px;justify-content:flex-end;
+}
+.btn-cancel{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text-dim);
+  background:transparent;border:1px solid var(--border);
+  padding:11px 22px;border-radius:4px;cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+.btn-cancel:hover{border-color:var(--text-dim);color:var(--text);}
+.btn-submit{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--bg);
+  background:var(--gold);border:1px solid var(--gold);
+  padding:11px 28px;border-radius:4px;cursor:pointer;
+  transition:background .2s,box-shadow .2s;
+}
+.btn-submit:hover{background:#e0ba56;box-shadow:0 0 16px rgba(201,168,76,.35);}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:32px 40px;text-align:center;
+}
+footer::before{
+  content:'';display:block;width:40%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);
+  margin:-32px auto 30px;
+}
+.footer-copy{font-size:12px;color:var(--rune);font-style:italic;}
+
+/* ── MOBILE ── */
+.mobile-menu{
+  display:none;position:fixed;top:var(--nav-h);left:0;right:0;
+  background:rgba(7,8,15,.97);border-bottom:1px solid var(--border);
+  padding:20px 24px;z-index:99;flex-direction:column;gap:4px;
+}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--text-dim);text-decoration:none;
+  padding:12px 8px;border-bottom:1px solid var(--border);transition:color .2s;
+}
+.mobile-menu a:last-child{border-bottom:none;}
+.mobile-menu a:hover{color:var(--gold);}
+
+@media(max-width:780px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .nav-mobile-btn{display:flex;}
+  .page-header,.header-rule,.filters,.roster{padding-left:20px;padding-right:20px;}
+  .page-header{padding-top:calc(var(--nav-h) + 36px);}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../" class="nav-brand">
+    <span class="brand-rune">⚔</span>
+    Rougarole
+  </a>
+  <ul class="nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../characters/" class="active">Characters</a></li>
+    <li><a href="../maps/">Maps</a></li>
+    <li><a href="../lore/">Lore</a></li>
+    <li><a href="../sessions/">Sessions</a></li>
+  </ul>
+  <button class="nav-mobile-btn" id="mobileBtn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../">Home</a>
+  <a href="../characters/">Characters</a>
+  <a href="../maps/">Maps</a>
+  <a href="../lore/">Lore</a>
+  <a href="../sessions/">Sessions</a>
+</div>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+  <div class="page-header-text">
+    <p class="page-eyebrow">
+      <a href="../">Rougarole</a>
+      <span class="sep">›</span>
+      <span id="breadcrumbCampaign"></span>
+      Characters
+    </p>
+    <h1 class="page-title">Character Roster</h1>
+    <p class="page-desc" id="pageDesc">All known agents of the Whittington Guard — their names, their owners, their campaigns.</p>
+  </div>
+  <button class="btn-new" id="openModal">
+    <span class="plus">+</span> New Character
+  </button>
+</header>
+
+<div class="header-rule"><hr></div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search characters…">
+  </div>
+  <select class="filter-select" id="campaignFilter">
+    <option value="">All Campaigns</option>
+  </select>
+  <span class="results-count" id="resultsCount"></span>
+</div>
+
+<!-- ROSTER GRID -->
+<main class="roster">
+  <div class="card-grid" id="cardGrid">
+    <!-- populated by JS -->
+  </div>
+</main>
+
+<footer>
+  <p class="footer-copy">Archives of the Whittington Guard &bull; All records are living documents.</p>
+</footer>
+
+<!-- ADD CHARACTER MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <p class="modal-eyebrow">New Entry</p>
+      <h2 class="modal-title" id="modalTitle">Add Character</h2>
+      <button class="modal-close" id="closeModal" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="charName">Character Name</label>
+        <input class="field-input" type="text" id="charName" placeholder="e.g. Kai Ketash'Dohr" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label" for="charOwner">Owner</label>
+        <input class="field-input" type="text" id="charOwner" placeholder="Player's name" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label" for="charCampaign">Campaign</label>
+        <input class="field-input" type="text" id="charCampaign" placeholder="Campaign name" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label">Character Sheet (HTML)</label>
+        <div class="file-drop" id="fileDrop">
+          <input type="file" id="fileInput" accept=".html">
+          <span class="file-drop-icon">📄</span>
+          <span class="file-drop-label">Drop HTML file here or click to browse</span>
+          <span class="file-drop-name" id="fileDropName"></span>
+        </div>
+        <p class="field-hint">Upload the character's .html sheet file. Any file size is supported.</p>
+      <p id="fileErrorMsg" style="display:none;font-size:12px;color:#ff4422;font-style:italic;margin-top:5px;"></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="cancelModal">Cancel</button>
+      <button class="btn-submit" id="submitModal">Add to Roster</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── GLYPHS
+const GLYPHS = ['⚔','🜂','✦','⚡','🌙','🔮','🗡','⚜','🜁','🜃','🜄','☽'];
+
+// ────────────────────────────────────────────────────────────
+// STORAGE LAYER
+//   localStorage  → character metadata (name, owner, campaign, id, hasSheet flag)
+//   IndexedDB     → raw HTML sheet data, keyed by character id
+//   No size limits on either for practical use
+// ────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'rougarole_characters';
+
+function loadChars() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function saveChars(chars) {
+  // Never store sheetData in localStorage — strip it just in case
+  const clean = chars.map(c => { const {sheetData, ...rest} = c; return rest; });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+}
+
+// ── IndexedDB helpers
+const DB_NAME    = 'rougarole_sheets';
+const DB_VERSION = 1;
+const STORE_NAME = 'sheets';
+let _db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (_db) { resolve(_db); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(STORE_NAME, { keyPath: 'id' });
+    };
+    req.onsuccess = e => { _db = e.target.result; resolve(_db); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function saveSheet(id, html) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put({ id, html });
+    tx.oncomplete = resolve;
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+async function getSheet(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).get(id);
+    req.onsuccess = e => resolve(e.target.result?.html || null);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function deleteSheet(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).delete(id);
+    tx.oncomplete = resolve;
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+// ── BUILD CAMPAIGN FILTER
+function rebuildFilter(chars) {
+  const sel = document.getElementById('campaignFilter');
+  const current = sel.value;
+  const campaigns = [...new Set(chars.map(c => c.campaign).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All Campaigns</option>';
+  campaigns.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    if (c === current) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+// ── RENDER
+function render() {
+  const chars = loadChars();
+  const query    = document.getElementById('searchInput').value.trim().toLowerCase();
+  const campaign = document.getElementById('campaignFilter').value;
+
+  rebuildFilter(chars);
+
+  const filtered = chars.filter(c => {
+    const matchSearch = !query ||
+      c.name.toLowerCase().includes(query) ||
+      c.owner.toLowerCase().includes(query) ||
+      c.campaign.toLowerCase().includes(query);
+    const matchCampaign = !campaign || c.campaign === campaign;
+    return matchSearch && matchCampaign;
+  });
+
+  const grid  = document.getElementById('cardGrid');
+  const count = document.getElementById('resultsCount');
+  grid.innerHTML = '';
+
+  count.textContent = filtered.length
+    ? filtered.length + ' character' + (filtered.length !== 1 ? 's' : '')
+    : '';
+
+  if (!filtered.length) {
+    grid.innerHTML =
+      '<div class="empty-state">' +
+        '<span class="empty-icon">⚔</span>' +
+        '<p class="empty-title">' + (chars.length ? 'No matches found' : 'No characters yet') + '</p>' +
+        '<p class="empty-body">' + (chars.length ? 'Try adjusting your search or filter.' : 'Add the first member of the roster using the button above.') + '</p>' +
+      '</div>';
+    return;
+  }
+
+  filtered.forEach((c, i) => {
+    const glyph = GLYPHS[Math.abs(hashStr(c.name)) % GLYPHS.length];
+    const card  = document.createElement('div');
+    card.className  = 'char-card';
+    card.dataset.id = c.id;
+    card.innerHTML =
+      '<div class="card-top">' +
+        '<span class="card-glyph">' + glyph + '</span>' +
+        '<div class="card-name">' + esc(c.name) + '</div>' +
+        '<div class="card-meta">' +
+          '<div class="meta-row"><span class="meta-label">Owner</span><span class="meta-val">' + esc(c.owner) + '</span></div>' +
+          '<div class="meta-row"><span class="meta-label">Campaign</span><span class="meta-val">' + esc(c.campaign) + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card-bottom">' +
+        (c.hasSheet
+          ? '<a class="card-sheet-link" href="#" data-id="' + c.id + '">📄 View Sheet →</a>'
+          : '<span style="font-family:Cinzel,serif;font-size:9px;letter-spacing:1px;color:var(--rune);font-style:italic;">No sheet uploaded</span>'
+        ) +
+        '<button class="card-delete" data-del="' + c.id + '" title="Remove character">🗑</button>' +
+      '</div>';
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add('visible'), i * 60);
+  });
+}
+
+// ── VIEW SHEET (async — fetches from IndexedDB)
+document.getElementById('cardGrid').addEventListener('click', async e => {
+  const link = e.target.closest('.card-sheet-link');
+  if (link) {
+    e.preventDefault();
+    try {
+      const html = await getSheet(link.dataset.id);
+      if (!html) { alert('Sheet not found — it may not have been saved correctly.'); return; }
+      const blob = new Blob([html], { type: 'text/html' });
+      const url  = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch(err) {
+      alert('Could not open sheet: ' + err.message);
+    }
+    return;
+  }
+
+  // Delete
+  const btn = e.target.closest('.card-delete');
+  if (btn) {
+    const id    = btn.dataset.del;
+    const chars = loadChars();
+    const char  = chars.find(c => c.id === id);
+    if (!char) return;
+    if (!window.confirm('Remove "' + char.name + '" from the roster?')) return;
+    saveChars(chars.filter(c => c.id !== id));
+    await deleteSheet(id);
+    render();
+  }
+});
+
+// ── HASH
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return h;
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── MODAL
+const overlay    = document.getElementById('modalOverlay');
+const openBtn    = document.getElementById('openModal');
+const closeBtn   = document.getElementById('closeModal');
+const cancelBtn  = document.getElementById('cancelModal');
+let pendingSheetData = null;
+
+function setFileError(msg) {
+  const el = document.getElementById('fileErrorMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function openModal() {
+  overlay.classList.add('open');
+  document.getElementById('charName').focus();
+}
+function closeModal() {
+  overlay.classList.remove('open');
+  ['charName','charOwner','charCampaign'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fileInput').value     = '';
+  document.getElementById('fileDropName').textContent = '';
+  document.getElementById('fileDrop').classList.remove('has-file','file-error');
+  setFileError('');
+  pendingSheetData = null;
+}
+
+openBtn.addEventListener('click', openModal);
+closeBtn.addEventListener('click', closeModal);
+cancelBtn.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── FILE INPUT — read on selection, no size limit warning needed
+const fileInput    = document.getElementById('fileInput');
+const fileDrop     = document.getElementById('fileDrop');
+const fileDropName = document.getElementById('fileDropName');
+
+function readHTMLFile(file) {
+  setFileError('');
+  fileDrop.classList.remove('file-error');
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.html')) {
+    setFileError('Please upload an .html file.');
+    fileDrop.classList.add('file-error');
+    return;
+  }
+  // No size cap — IndexedDB handles files of any size
+  fileDropName.textContent = file.name;
+  fileDrop.classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload  = e => { pendingSheetData = e.target.result; };
+  reader.onerror = () => { setFileError('Could not read the file — please try again.'); pendingSheetData = null; };
+  reader.readAsText(file);
+}
+
+fileInput.addEventListener('change', () => readHTMLFile(fileInput.files[0]));
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault();
+  fileDrop.classList.remove('dragover');
+  readHTMLFile(e.dataTransfer.files[0]);
+});
+
+// ── SUBMIT
+document.getElementById('submitModal').addEventListener('click', async () => {
+  const name     = document.getElementById('charName').value.trim();
+  const owner    = document.getElementById('charOwner').value.trim();
+  const campaign = document.getElementById('charCampaign').value.trim();
+
+  if (!name)     { document.getElementById('charName').focus();     return; }
+  if (!owner)    { document.getElementById('charOwner').focus();    return; }
+  if (!campaign) { document.getElementById('charCampaign').focus(); return; }
+
+  // Disable button while saving
+  const submitBtn = document.getElementById('submitModal');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving…';
+
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+  try {
+    // Save sheet HTML to IndexedDB if present
+    if (pendingSheetData) {
+      await saveSheet(id, pendingSheetData);
+    }
+    // Save metadata to localStorage (no HTML — just a flag)
+    const chars = loadChars();
+    chars.unshift({ id, name, owner, campaign, hasSheet: !!pendingSheetData, added: new Date().toISOString() });
+    saveChars(chars);
+    closeModal();
+    render();
+  } catch(err) {
+    setFileError('Save failed: ' + err.message + '. Please try again.');
+    console.error(err);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Add to Roster';
+  }
+});
+
+// ── FILTERS
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('campaignFilter').addEventListener('change', render);
+
+// ── MOBILE NAV
+document.getElementById('mobileBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+
+// ── INIT — pre-filter by campaign param if arriving from campaign hub
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const camp   = params.get('campaign');
+  if (camp) {
+    const bc = document.getElementById('breadcrumbCampaign');
+    if (bc) bc.innerHTML = camp + ' <span class="sep">›</span> ';
+    document.title = camp + ' Characters — Rougarole';
+    const sel = document.getElementById('campaignFilter');
+    let found = false;
+    for (const opt of sel.options) { if (opt.value === camp) { opt.selected = true; found = true; break; } }
+    if (!found) {
+      const o = document.createElement('option');
+      o.value = camp; o.textContent = camp; o.selected = true;
+      sel.appendChild(o);
+    }
+  }
+})();
+render();
+</script>
+</body>
+</html>
