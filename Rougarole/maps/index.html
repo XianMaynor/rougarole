@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maps — Rougarole</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--surface:#0d0f1a;--surface2:#111425;--border:#2a2d45;--border-glow:#3d4170;
+  --text:#c8cce8;--text-dim:#6b7099;--text-bright:#e8ecff;--gold:#c9a84c;--gold-dim:#7a6430;
+  --gold-glow:rgba(201,168,76,.25);--anger:#cc2200;--anger-glow:#ff4422;--rune:#4a5080;--nav-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── NAV ── */
+nav{flex-shrink:0;height:var(--nav-h);background:rgba(7,8,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;position:relative;}
+nav::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);}
+.nav-brand{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--text-bright);letter-spacing:2px;text-decoration:none;display:flex;align-items:center;gap:9px;}
+.nav-brand .brand-rune{font-size:20px;opacity:.8;text-shadow:0 0 12px var(--anger-glow);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:6px 11px;border-radius:4px;border:1px solid transparent;transition:color .2s,border-color .2s,background .2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.06);}
+.nav-mobile-btn{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px;}
+.nav-mobile-btn span{display:block;width:22px;height:1.5px;background:var(--text-dim);}
+.mobile-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:rgba(7,8,15,.97);border-bottom:1px solid var(--border);padding:20px 24px;z-index:200;flex-direction:column;gap:4px;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:12px 8px;border-bottom:1px solid var(--border);}
+.mobile-menu a:hover{color:var(--gold);}
+
+/* ── APP SHELL ── */
+.app{flex:1;display:flex;overflow:hidden;position:relative;}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:rgba(13,15,26,.96);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  z-index:10;
+  transition:transform .3s;
+}
+.sidebar-header{padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sidebar-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.campaign-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--text);outline:none;cursor:pointer;transition:border-color .2s;}
+.campaign-select:focus{border-color:var(--gold-dim);}
+.btn-new-map{width:100%;margin-top:8px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);border:1px solid var(--gold);padding:9px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,box-shadow .2s;}
+.btn-new-map:hover{background:#e0ba56;box-shadow:0 0 14px rgba(201,168,76,.3);}
+
+.map-list{flex:1;overflow-y:auto;padding:8px;}
+.map-list::-webkit-scrollbar{width:4px;}
+.map-list::-webkit-scrollbar-track{background:transparent;}
+.map-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.map-item{
+  padding:10px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid transparent;
+  display:flex;align-items:center;gap:10px;
+  transition:background .2s,border-color .2s;
+  margin-bottom:4px;
+  position:relative;
+}
+.map-item:hover{background:var(--surface2);border-color:var(--border);}
+.map-item.active{background:var(--surface2);border-color:var(--border-glow);}
+.map-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);border-radius:2px 0 0 2px;}
+.map-item-icon{font-size:18px;flex-shrink:0;}
+.map-item-info{flex:1;min-width:0;}
+.map-item-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--text-bright);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.map-item-meta{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:2px;}
+.map-item-del{background:none;border:none;cursor:pointer;color:var(--text-dim);opacity:0;font-size:13px;padding:2px 4px;border-radius:3px;transition:opacity .2s,color .2s;flex-shrink:0;}
+.map-item:hover .map-item-del{opacity:.6;}
+.map-item-del:hover{color:var(--anger-glow);opacity:1 !important;}
+
+.sidebar-empty{padding:24px 12px;text-align:center;}
+.sidebar-empty-icon{font-size:28px;opacity:.2;display:block;margin-bottom:8px;}
+.sidebar-empty-text{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--rune);}
+
+/* ── MAP CANVAS AREA ── */
+.map-area{flex:1;position:relative;overflow:hidden;background:var(--bg);}
+
+/* Empty state */
+.map-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;pointer-events:none;}
+.map-empty-icon{font-size:56px;opacity:.1;}
+.map-empty-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim);opacity:.4;}
+
+/* Upload drop zone (shown when map has no image) */
+.map-upload-zone{
+  position:absolute;inset:40px;
+  border:2px dashed var(--border-glow);
+  border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  cursor:pointer;transition:border-color .25s,background .25s;
+  pointer-events:all;
+}
+.map-upload-zone:hover,.map-upload-zone.dragover{border-color:var(--gold-dim);background:rgba(201,168,76,.03);}
+.map-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:40px;opacity:.3;}
+.upload-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);}
+.upload-sub{font-size:13px;color:var(--rune);font-style:italic;}
+
+/* Pan/zoom viewport */
+.map-viewport{position:absolute;inset:0;overflow:hidden;cursor:grab;}
+.map-viewport.panning{cursor:grabbing;}
+.map-viewport.adding-marker{cursor:crosshair;}
+.map-canvas{position:absolute;transform-origin:0 0;user-select:none;}
+.map-image{display:block;max-width:none;pointer-events:none;user-select:none;}
+
+/* ── MARKERS ── */
+.marker{
+  position:absolute;
+  transform:translate(-50%,-100%);
+  cursor:pointer;z-index:5;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.7));
+  transition:transform .15s, filter .15s;
+}
+.marker:hover{transform:translate(-50%,-100%) scale(1.2);}
+.marker svg{display:block;}
+.marker-pin{width:28px;height:36px;}
+
+/* ── TOOLBAR ── */
+.map-toolbar{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:6px;
+  background:rgba(13,15,26,.92);border:1px solid var(--border);
+  border-radius:8px;padding:6px 10px;
+  backdrop-filter:blur(8px);z-index:20;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.toolbar-btn{
+  background:none;border:1px solid transparent;
+  color:var(--text-dim);width:34px;height:34px;border-radius:5px;
+  cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;
+  transition:color .2s,border-color .2s,background .2s;
+  position:relative;
+}
+.toolbar-btn:hover{color:var(--text-bright);border-color:var(--border-glow);background:var(--surface2);}
+.toolbar-btn.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.08);}
+.toolbar-sep{width:1px;height:22px;background:var(--border);margin:0 2px;}
+.toolbar-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:0 4px;}
+.toolbar-btn[title]:hover::after{
+  content:attr(title);
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(7,8,15,.95);border:1px solid var(--border);
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-dim);padding:4px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:50;
+}
+
+/* Zoom display */
+.zoom-display{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--text-dim);min-width:40px;text-align:center;}
+
+/* Map name badge */
+.map-name-badge{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text-dim);background:rgba(13,15,26,.85);
+  border:1px solid var(--border);border-radius:20px;padding:5px 16px;
+  backdrop-filter:blur(6px);z-index:20;pointer-events:none;
+}
+
+/* ── MARKER POPUP (inline on canvas) ── */
+.marker-popup{
+  position:absolute;
+  z-index:50;
+  width:240px;
+  background:rgba(13,15,26,.97);
+  border:1px solid var(--border-glow);
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.7);
+  transform:translate(-50%,-100%) translateY(-14px);
+  pointer-events:all;
+  animation:popupIn .18s ease;
+}
+.marker-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);}
+/* little tail */
+.marker-popup::after{
+  content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  width:12px;height:7px;
+  background:rgba(13,15,26,.97);
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  border-left:1px solid var(--border-glow);
+  border-right:1px solid var(--border-glow);
+}
+@keyframes popupIn{from{opacity:0;transform:translate(-50%,-100%) translateY(-20px);}to{opacity:1;transform:translate(-50%,-100%) translateY(-14px);}}
+.popup-img-wrap{position:relative;width:100%;height:130px;overflow:hidden;background:var(--surface2);}
+.popup-img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;transition:transform .3s,filter .3s;}
+.popup-img:hover{transform:scale(1.04);filter:brightness(1.15);}
+.popup-img-link-hint{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.75));
+  padding:18px 10px 8px;
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);text-align:center;
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.popup-img-wrap:hover .popup-img-link-hint{opacity:1;}
+.popup-no-img{width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:.2;}
+.popup-body{padding:12px 14px 14px;}
+.popup-title{font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--text-bright);letter-spacing:.5px;margin-bottom:5px;line-height:1.3;}
+.popup-desc{font-size:12px;color:var(--text-dim);font-style:italic;line-height:1.5;max-height:60px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.popup-footer{padding:8px 14px 11px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.popup-edit-btn{font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:none;border:1px solid var(--border);padding:4px 10px;border-radius:3px;cursor:pointer;transition:color .2s,border-color .2s;}
+.popup-edit-btn:hover{color:var(--gold);border-color:var(--gold-dim);}
+.popup-close-btn{background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:14px;padding:2px 5px;border-radius:3px;transition:color .2s;}
+.popup-close-btn:hover{color:var(--text-bright);}
+.popup-no-link-hint{font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--rune);font-style:italic;}
+
+/* ── EDIT PANEL (right side) ── */
+.marker-panel{
+  position:absolute;top:0;right:0;bottom:0;
+  width:300px;
+  background:rgba(13,15,26,.97);
+  border-left:1px solid var(--border);
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  z-index:30;
+  display:flex;flex-direction:column;
+  backdrop-filter:blur(12px);
+}
+.marker-panel.open{transform:translateX(0);}
+.marker-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.panel-header{padding:18px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.panel-header-text{flex:1;}
+.panel-eyebrow{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.panel-title-input{font-family:'Cinzel Decorative',serif;font-size:15px;color:var(--text-bright);letter-spacing:1px;background:none;border:none;outline:none;width:100%;border-bottom:1px solid transparent;transition:border-color .2s;padding-bottom:2px;}
+.panel-title-input:focus{border-bottom-color:var(--gold-dim);}
+.panel-close{background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:17px;padding:2px;width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;flex-shrink:0;}
+.panel-close:hover{color:var(--text-bright);background:var(--surface2);}
+.panel-body{flex:1;overflow-y:auto;padding:14px 16px;}
+.panel-body::-webkit-scrollbar{width:4px;}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.panel-field{margin-bottom:16px;}
+.panel-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
+.panel-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:9px 11px;font-family:'Crimson Pro',serif;font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:80px;transition:border-color .2s;}
+.panel-textarea:focus{border-color:var(--gold-dim);}
+.panel-textarea::placeholder{color:var(--rune);}
+.panel-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:9px 11px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--text);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7099'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;transition:border-color .2s;}
+.panel-select:focus{border-color:var(--gold-dim);}
+.panel-select option{background:var(--surface2);color:var(--text);}
+.panel-img-drop{width:100%;background:var(--surface2);border:1px dashed var(--border-glow);border-radius:6px;padding:16px 10px;text-align:center;cursor:pointer;position:relative;transition:border-color .2s,background .2s;}
+.panel-img-drop:hover,.panel-img-drop.dragover{border-color:var(--gold-dim);background:rgba(201,168,76,.04);}
+.panel-img-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.panel-img-preview{width:100%;border-radius:5px;display:block;margin-bottom:7px;max-height:120px;object-fit:cover;}
+.panel-img-drop-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);}
+.panel-img-remove{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,68,34,.5);background:none;border:none;cursor:pointer;margin-top:5px;display:block;width:100%;text-align:center;transition:color .2s;}
+.panel-img-remove:hover{color:var(--anger-glow);}
+.color-picker{display:flex;gap:7px;flex-wrap:wrap;}
+.color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
+.color-swatch:hover{transform:scale(1.15);}
+.color-swatch.selected{border-color:white;transform:scale(1.1);}
+.panel-footer{padding:10px 16px 14px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.btn-save-marker{flex:1;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);border:1px solid var(--gold);padding:9px;border-radius:4px;cursor:pointer;transition:background .2s;}
+.btn-save-marker:hover{background:#e0ba56;}
+.btn-delete-marker{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,68,34,.5);background:transparent;border:1px solid rgba(255,68,34,.2);padding:9px 12px;border-radius:4px;cursor:pointer;transition:color .2s,border-color .2s;}
+.btn-delete-marker:hover{color:var(--anger-glow);border-color:rgba(255,68,34,.5);}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,5,10,.85);backdrop-filter:blur(6px);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border-glow);border-radius:10px;width:100%;max-width:440px;position:relative;overflow:hidden;transform:translateY(16px) scale(.98);transition:transform .25s;}
+.modal-overlay.open .modal{transform:none;}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.modal-header{padding:24px 24px 16px;border-bottom:1px solid var(--border);}
+.modal-eyebrow{font-family:'Cinzel',serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.modal-title{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--text-bright);letter-spacing:1px;}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:17px;color:var(--text-dim);width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;}
+.modal-close:hover{color:var(--text-bright);background:var(--surface2);}
+.modal-body{padding:20px 24px;}
+.field{margin-bottom:18px;}
+.field-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
+.field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;font-family:'Crimson Pro',serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s;}
+.field-input:focus{border-color:var(--gold-dim);}
+.field-input::placeholder{color:var(--rune);}
+.modal-footer{padding:6px 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
+.btn-cancel{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:10px 18px;border-radius:4px;cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-cancel:hover{border-color:var(--text-dim);color:var(--text);}
+.btn-submit{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);border:1px solid var(--gold);padding:10px 22px;border-radius:4px;cursor:pointer;transition:background .2s,box-shadow .2s;}
+.btn-submit:hover{background:#e0ba56;box-shadow:0 0 14px rgba(201,168,76,.3);}
+
+/* Icon picker in new map modal */
+.icon-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.icon-opt{width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;}
+.icon-opt:hover{border-color:var(--border-glow);}
+.icon-opt.selected{border-color:var(--gold);background:rgba(201,168,76,.1);}
+
+/* Sidebar toggle for mobile */
+.sidebar-toggle{display:none;position:absolute;top:10px;left:10px;z-index:25;background:rgba(13,15,26,.9);border:1px solid var(--border);color:var(--text-dim);width:34px;height:34px;border-radius:6px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;}
+
+@media(max-width:780px){
+  nav{padding:0 16px;}
+  .nav-links{display:none;}
+  .nav-mobile-btn{display:flex;}
+  .sidebar{position:absolute;top:0;bottom:0;left:0;transform:translateX(-100%);z-index:40;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-toggle{display:flex;}
+  .map-toolbar{left:60px;transform:none;}
+  .marker-panel{width:100%;border-left:none;border-top:1px solid var(--border);top:auto;height:60%;}
+  .marker-panel.open{transform:translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../" class="nav-brand"><span class="brand-rune">⚔</span>Rougarole</a>
+  <ul class="nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../characters/">Characters</a></li>
+    <li><a href="../maps/" class="active">Maps</a></li>
+  </ul>
+  <button class="nav-mobile-btn" id="mobileBtn"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../">Home</a>
+  <a href="../characters/">Characters</a>
+  <a href="../maps/">Maps</a>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Campaign</div>
+      <select class="campaign-select" id="campaignSelect">
+        <option value="">— Select Campaign —</option>
+      </select>
+      <button class="btn-new-map" id="btnNewMap">＋ New Map</button>
+    </div>
+    <div class="map-list" id="mapList">
+      <div class="sidebar-empty">
+        <span class="sidebar-empty-icon">🗺</span>
+        <span class="sidebar-empty-text">Select a campaign</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAP AREA -->
+  <div class="map-area" id="mapArea">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+    <!-- Shown when no map selected -->
+    <div class="map-empty" id="mapEmpty">
+      <span class="map-empty-icon">🗺</span>
+      <span class="map-empty-title">Select or create a map</span>
+    </div>
+
+    <!-- Upload zone shown when map has no image -->
+    <div class="map-upload-zone" id="mapUploadZone" style="display:none;">
+      <input type="file" id="mapImageInput" accept="image/*">
+      <span class="upload-icon">🖼</span>
+      <span class="upload-label">Upload Map Image</span>
+      <span class="upload-sub">PNG, JPG, WebP — any size</span>
+    </div>
+
+    <!-- Viewport for pan/zoom -->
+    <div class="map-viewport" id="mapViewport" style="display:none;">
+      <div class="map-canvas" id="mapCanvas">
+        <img class="map-image" id="mapImage" src="" alt="Map" draggable="false">
+        <!-- markers injected here -->
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="map-toolbar" id="mapToolbar" style="display:none;">
+      <span class="toolbar-label">🗺</span>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btnZoomIn" title="Zoom In">＋</button>
+      <span class="zoom-display" id="zoomDisplay">100%</span>
+      <button class="toolbar-btn" id="btnZoomOut" title="Zoom Out">－</button>
+      <button class="toolbar-btn" id="btnZoomFit" title="Fit to Screen">⊡</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btnAddMarker" title="Add Marker">📍</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btnReplaceImage" title="Replace Image">🖼</button>
+      <input type="file" id="replaceImageInput" accept="image/*" style="display:none;">
+    </div>
+
+    <!-- Map name badge -->
+    <div class="map-name-badge" id="mapNameBadge" style="display:none;"></div>
+
+    <!-- Marker panel -->
+    <div class="marker-panel" id="markerPanel">
+      <div class="panel-header">
+        <div class="panel-header-text">
+          <div class="panel-eyebrow">Edit Marker</div>
+        </div>
+        <button class="panel-close" id="panelClose">✕</button>
+      </div>
+      <div class="panel-body">
+        <div class="panel-field">
+          <label class="panel-label">Title</label>
+          <input class="panel-title-input" id="panelTitle" type="text" placeholder="Marker name…" autocomplete="off" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:9px 11px;font-family:'Crimson Pro',serif;font-size:14px;color:var(--text);outline:none;">
+        </div>
+        <div class="panel-field">
+          <label class="panel-label">Description</label>
+          <textarea class="panel-textarea" id="panelDesc" placeholder="Notes about this location…"></textarea>
+        </div>
+        <div class="panel-field">
+          <label class="panel-label">Location Image</label>
+          <div class="panel-img-drop" id="panelImgDrop">
+            <input type="file" id="panelImgInput" accept="image/*">
+            <img class="panel-img-preview" id="panelImgPreview" style="display:none;" src="" alt="">
+            <span class="panel-img-drop-label" id="panelImgLabel">Drop image or click to upload</span>
+          </div>
+          <button class="panel-img-remove" id="panelImgRemove" style="display:none;">✕ Remove Image</button>
+        </div>
+        <div class="panel-field">
+          <label class="panel-label">Links To Map</label>
+          <select class="panel-select" id="panelLinkedMap">
+            <option value="">— No linked map —</option>
+          </select>
+          <p style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--rune);margin-top:5px;font-style:italic;">Clicking the popup image will load this map</p>
+        </div>
+        <div class="panel-field">
+          <label class="panel-label">Marker Color</label>
+          <div class="color-picker" id="colorPicker"></div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button class="btn-save-marker" id="btnSaveMarker">Save Marker</button>
+        <button class="btn-delete-marker" id="btnDeleteMarker" style="display:none;">Delete</button>
+      </div>
+    </div>
+
+  </div><!-- /map-area -->
+</div><!-- /app -->
+
+<!-- NEW MAP MODAL -->
+<div class="modal-overlay" id="newMapOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <p class="modal-eyebrow">New Entry</p>
+      <h2 class="modal-title">Add Map</h2>
+      <button class="modal-close" id="newMapClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="newMapName">Map Name</label>
+        <input class="field-input" type="text" id="newMapName" placeholder="e.g. The Shattered Vale — World Map" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label">Icon</label>
+        <div class="icon-picker" id="mapIconPicker"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="newMapCancel">Cancel</button>
+      <button class="btn-submit" id="newMapSubmit">Create Map</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Supabase
+const SB_URL='https://wzesjwjbecmxliwiialj.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6ZXNqd2piZWNteGxpd2lpYWxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTkxNTcsImV4cCI6MjA5NTQzNTE1N30.mGjoDfO_fzRPp9_rPxG7bJ0xfC4oHF0kY0Ka05TmgBc';
+const HDR={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+const STORAGE_HDR={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+async function sbGet(t,q=''){const r=await fetch(SB_URL+'/rest/v1/'+t+'?'+q,{headers:{...HDR,'Accept':'application/json'}});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbPost(t,d){const r=await fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers:{...HDR,'Prefer':'return=representation'},body:JSON.stringify(d)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbPatch(t,id,d){const r=await fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+id,{method:'PATCH',headers:{...HDR,'Prefer':'return=representation'},body:JSON.stringify(d)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbDel(t,id){const r=await fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+id,{method:'DELETE',headers:HDR});if(!r.ok)throw new Error(await r.text());}
+async function sbUpload(path,blob){const r=await fetch(SB_URL+'/storage/v1/object/rougarole/'+path,{method:'POST',headers:{...STORAGE_HDR,'Content-Type':blob.type||'application/octet-stream','x-upsert':'true'},body:blob});if(!r.ok)throw new Error(await r.text());return SB_URL+'/storage/v1/object/public/rougarole/'+path;}
+async function sbDeleteFile(path){await fetch(SB_URL+'/storage/v1/object/rougarole/'+path,{method:'DELETE',headers:STORAGE_HDR});}
+
+// ── STATE
+let currentCampaign='', currentMapId=null, markers=[], maps=[];
+let scale=1, panX=0, panY=0, isPanning=false, panStart={x:0,y:0}, panOrigin={x:0,y:0};
+const MIN_SCALE=0.1, MAX_SCALE=8;
+let addingMarker=false, activeMarkerId=null, pendingMarkerBlob=null, selectedColor='#ff4422';
+let activePopupId=null;
+const MARKER_COLORS=['#ff4422','#c9a84c','#4488ff','#22ff66','#bb44ff','#ff88aa','#ffffff','#aaaaaa'];
+const MAP_ICONS=['🗺','🏰','🌋','⚔','🌊','🏔','🌿','🏛','🗝','💀','🌙','✦'];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+
+// ── CAMPAIGNS
+async function populateCampaigns(){
+  const sel=document.getElementById('campaignSelect');
+  try{
+    const camps=await sbGet('campaigns','order=created_at.asc');
+    sel.innerHTML='<option value="">— Select Campaign —</option>';
+    camps.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id; o.textContent=c.name;
+      if(c.id===currentCampaign) o.selected=true;
+      sel.appendChild(o);
+    });
+  }catch(e){console.error('Could not load campaigns:',e);}
+}
+
+document.getElementById('campaignSelect').addEventListener('change',async function(){
+  currentCampaign=this.value; currentMapId=null;
+  closePopup(); closePanel();
+  await loadMapsForCampaign();
+  loadMapView(null);
+});
+
+// ── MAPS SIDEBAR
+async function loadMapsForCampaign(){
+  maps=[];
+  if(!currentCampaign){renderSidebar();return;}
+  try{ maps=await sbGet('maps','campaign_id=eq.'+currentCampaign+'&order=created_at.asc'); }
+  catch(e){console.error(e);}
+  renderSidebar();
+}
+
+function renderSidebar(){
+  const list=document.getElementById('mapList');
+  if(!currentCampaign||!maps.length){
+    list.innerHTML='<div class="sidebar-empty"><span class="sidebar-empty-icon">🗺</span><span class="sidebar-empty-text">'+(currentCampaign?'No maps yet':'Select a campaign')+'</span></div>';
+    return;
+  }
+  list.innerHTML='';
+  maps.forEach(m=>{
+    const mc=markers.filter(mk=>mk.map_id===m.id).length;
+    const item=document.createElement('div');
+    item.className='map-item'+(m.id===currentMapId?' active':'');
+    item.innerHTML=
+      '<span class="map-item-icon">'+m.icon+'</span>'+
+      '<div class="map-item-info">'+
+        '<div class="map-item-name">'+esc(m.name)+'</div>'+
+        '<div class="map-item-meta">'+mc+' marker'+(mc===1?'':'s')+'</div>'+
+      '</div>'+
+      '<button class="map-item-del" data-del="'+m.id+'" title="Delete map">🗑</button>';
+    item.addEventListener('click',e=>{if(e.target.closest('.map-item-del'))return;selectMap(m.id);});
+    item.querySelector('.map-item-del').addEventListener('click',e=>{e.stopPropagation();deleteMap(m.id);});
+    list.appendChild(item);
+  });
+}
+
+async function deleteMap(id){
+  const m=maps.find(x=>x.id===id);
+  if(!m||!confirm('Delete "'+m.name+'"? All markers will be lost.')) return;
+  try{
+    await sbDel('maps',id);
+    try{await sbDeleteFile('maps/'+id);}catch{}
+    maps=maps.filter(x=>x.id!==id);
+    markers=markers.filter(x=>x.map_id!==id);
+    if(currentMapId===id){currentMapId=null;loadMapView(null);}
+    renderSidebar();
+  }catch(e){alert('Could not delete map: '+e.message);}
+}
+
+// ── MAP VIEW
+async function selectMap(id){
+  currentMapId=id;
+  closePopup(); closePanel();
+  try{ markers=await sbGet('markers','map_id=eq.'+id+'&order=created_at.asc'); }
+  catch(e){console.error(e);markers=[];}
+  renderSidebar();
+  await loadMapView(id);
+}
+
+async function loadMapView(id){
+  const empty=document.getElementById('mapEmpty');
+  const uploadZone=document.getElementById('mapUploadZone');
+  const viewport=document.getElementById('mapViewport');
+  const toolbar=document.getElementById('mapToolbar');
+  const badge=document.getElementById('mapNameBadge');
+  if(!id){
+    empty.style.display='flex';uploadZone.style.display='none';
+    viewport.style.display='none';toolbar.style.display='none';badge.style.display='none';
+    return;
+  }
+  const map=maps.find(m=>m.id===id);
+  if(!map)return;
+  empty.style.display='none';
+  badge.textContent=map.icon+' '+map.name; badge.style.display='block';
+  toolbar.style.display='flex';
+  if(!map.image_url){
+    uploadZone.style.display='flex'; viewport.style.display='none';
+  } else {
+    uploadZone.style.display='none'; viewport.style.display='block';
+    const img=document.getElementById('mapImage');
+    img.src=map.image_url+'?t='+Date.now();
+    img.onload=()=>{fitToScreen();renderMarkers();};
+    if(img.complete&&img.naturalWidth){fitToScreen();renderMarkers();}
+  }
+}
+
+// ── PAN/ZOOM
+function applyTransform(){
+  document.getElementById('mapCanvas').style.transform='translate('+panX+'px,'+panY+'px) scale('+scale+')';
+  document.getElementById('zoomDisplay').textContent=Math.round(scale*100)+'%';
+}
+function fitToScreen(){
+  const vp=document.getElementById('mapViewport');
+  const img=document.getElementById('mapImage');
+  if(!img.naturalWidth)return;
+  const sx=vp.clientWidth/img.naturalWidth, sy=vp.clientHeight/img.naturalHeight;
+  scale=Math.min(sx,sy,1)*0.92;
+  panX=(vp.clientWidth-img.naturalWidth*scale)/2;
+  panY=(vp.clientHeight-img.naturalHeight*scale)/2;
+  applyTransform();
+}
+function zoomAt(factor,cx,cy){
+  const vp=document.getElementById('mapViewport');
+  cx=cx??vp.clientWidth/2; cy=cy??vp.clientHeight/2;
+  const ns=Math.max(MIN_SCALE,Math.min(MAX_SCALE,scale*factor));
+  const ratio=ns/scale;
+  panX=cx-ratio*(cx-panX); panY=cy-ratio*(cy-panY); scale=ns;
+  applyTransform();
+}
+
+document.getElementById('mapViewport').addEventListener('wheel',e=>{
+  e.preventDefault();
+  const rect=document.getElementById('mapViewport').getBoundingClientRect();
+  zoomAt(e.deltaY<0?1.1:1/1.1,e.clientX-rect.left,e.clientY-rect.top);
+},{passive:false});
+
+let lastPinchDist=null;
+document.getElementById('mapViewport').addEventListener('touchmove',e=>{
+  if(e.touches.length===2){
+    e.preventDefault();
+    const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+    const dist=Math.hypot(dx,dy);
+    if(lastPinchDist!==null){
+      const rect=document.getElementById('mapViewport').getBoundingClientRect();
+      zoomAt(dist/lastPinchDist,(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left,(e.touches[0].clientY+e.touches[1].clientY)/2-rect.top);
+    }
+    lastPinchDist=dist;
+  }
+},{passive:false});
+document.getElementById('mapViewport').addEventListener('touchend',()=>{lastPinchDist=null;});
+
+let mouseMovedAfterDown=false;
+document.getElementById('mapViewport').addEventListener('mousedown',e=>{
+  if(addingMarker||e.button!==0)return;
+  isPanning=true; mouseMovedAfterDown=false;
+  panStart={x:e.clientX,y:e.clientY}; panOrigin={x:panX,y:panY};
+  document.getElementById('mapViewport').classList.add('panning');
+});
+window.addEventListener('mousemove',e=>{
+  if(!isPanning)return;
+  const dx=e.clientX-panStart.x, dy=e.clientY-panStart.y;
+  if(Math.hypot(dx,dy)>3) mouseMovedAfterDown=true;
+  panX=panOrigin.x+dx; panY=panOrigin.y+dy; applyTransform();
+});
+window.addEventListener('mouseup',()=>{isPanning=false;document.getElementById('mapViewport').classList.remove('panning');});
+
+// Close popup when clicking on empty map area (not a marker, not panning)
+document.getElementById('mapViewport').addEventListener('click',e=>{
+  if(mouseMovedAfterDown) return; // was a pan drag, not a click
+  if(addingMarker&&!e.target.closest('.marker')){
+    // Place marker
+    const rect=document.getElementById('mapViewport').getBoundingClientRect();
+    const x=(e.clientX-rect.left-panX)/scale, y=(e.clientY-rect.top-panY)/scale;
+    placeMarker(x,y);
+    return;
+  }
+  if(!e.target.closest('.marker')&&!e.target.closest('.marker-popup')){
+    closePopup();
+  }
+});
+
+let touchPanStart=null,touchPanOrigin=null;
+document.getElementById('mapViewport').addEventListener('touchstart',e=>{if(e.touches.length===1&&!addingMarker){touchPanStart={x:e.touches[0].clientX,y:e.touches[0].clientY};touchPanOrigin={x:panX,y:panY};}},{passive:true});
+document.getElementById('mapViewport').addEventListener('touchmove',e=>{if(e.touches.length===1&&touchPanStart){panX=touchPanOrigin.x+(e.touches[0].clientX-touchPanStart.x);panY=touchPanOrigin.y+(e.touches[0].clientY-touchPanStart.y);applyTransform();}},{passive:true});
+document.getElementById('mapViewport').addEventListener('touchend',()=>{touchPanStart=null;});
+
+document.getElementById('btnZoomIn').addEventListener('click',()=>zoomAt(1.25));
+document.getElementById('btnZoomOut').addEventListener('click',()=>zoomAt(1/1.25));
+document.getElementById('btnZoomFit').addEventListener('click',fitToScreen);
+
+document.getElementById('btnAddMarker').addEventListener('click',()=>{
+  addingMarker=!addingMarker;
+  document.getElementById('btnAddMarker').classList.toggle('active',addingMarker);
+  document.getElementById('mapViewport').classList.toggle('adding-marker',addingMarker);
+  if(addingMarker) closePopup();
+});
+
+// ── PLACE MARKER
+async function placeMarker(x,y){
+  try{
+    const rows=await sbPost('markers',{id:uid(),map_id:currentMapId,x,y,title:'New Marker',description:'',color:'#ff4422'});
+    const mk=rows[0]; markers.push(mk);
+    renderMarkers(); renderSidebar();
+    addingMarker=false;
+    document.getElementById('btnAddMarker').classList.remove('active');
+    document.getElementById('mapViewport').classList.remove('adding-marker');
+    openPanel(mk.id); // open edit panel immediately for new marker
+  }catch(e){alert('Could not place marker: '+e.message);}
+}
+
+// ── RENDER MARKERS
+function renderMarkers(){
+  document.querySelectorAll('.marker').forEach(el=>el.remove());
+  const canvas=document.getElementById('mapCanvas');
+  markers.filter(mk=>mk.map_id===currentMapId).forEach(mk=>{
+    const el=document.createElement('div');
+    el.className='marker'; el.dataset.id=mk.id;
+    el.style.left=mk.x+'px'; el.style.top=mk.y+'px';
+    // If marker links to another map, show a slightly different pin shape
+    const hasLink = !!mk.linked_map_id;
+    el.innerHTML=
+      '<svg class="marker-pin" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">'+
+        '<path d="M14 0C6.268 0 0 6.268 0 14c0 9.625 14 22 14 22S28 23.625 28 14C28 6.268 21.732 0 14 0z" fill="'+(mk.color||'#ff4422')+'" opacity="0.92"/>'+
+        (hasLink
+          ? '<circle cx="14" cy="14" r="5" fill="white" opacity="0.9"/><circle cx="14" cy="14" r="2" fill="'+( mk.color||'#ff4422')+'" opacity="0.8"/>'
+          : '<circle cx="14" cy="14" r="5" fill="white" opacity="0.9"/>'
+        )+
+      '</svg>';
+    el.addEventListener('click',e=>{e.stopPropagation(); handleMarkerClick(mk.id);});
+    canvas.appendChild(el);
+  });
+}
+
+// ── MARKER CLICK → show popup
+function handleMarkerClick(markerId){
+  if(activePopupId===markerId){ closePopup(); return; }
+  closePopup();
+  closePanel();
+  activePopupId=markerId;
+  showPopup(markerId);
+}
+
+// ── SHOW POPUP
+function showPopup(markerId){
+  const mk=markers.find(m=>m.id===markerId);
+  if(!mk) return;
+  closePopup();
+  activePopupId=markerId;
+
+  const markerEl=document.querySelector('.marker[data-id="'+markerId+'"]');
+  if(!markerEl) return;
+
+  const popup=document.createElement('div');
+  popup.className='marker-popup';
+  popup.id='activePopup';
+
+  const linkedMap = mk.linked_map_id ? maps.find(m=>m.id===mk.linked_map_id) : null;
+
+  let imgHTML='';
+  if(mk.image_url){
+    imgHTML=
+      '<div class="popup-img-wrap" style="cursor:'+(linkedMap?'pointer':'default')+'" '+(linkedMap?'id="popupImgLink"':'')+'>'+
+        '<img class="popup-img" src="'+esc(mk.image_url)+'?t=1" alt="">'+
+        (linkedMap ? '<div class="popup-img-link-hint">→ Open '+esc(linkedMap.name)+'</div>' : '')+
+      '</div>';
+  } else {
+    imgHTML=
+      '<div class="popup-no-img" '+(linkedMap?'style="cursor:pointer" id="popupImgLink"':'')+'>'+
+        (linkedMap ? '🗺' : '📍')+
+      '</div>';
+  }
+
+  popup.innerHTML=
+    imgHTML+
+    '<div class="popup-body">'+
+      '<div class="popup-title">'+esc(mk.title||'Unnamed')+'</div>'+
+      (mk.description ? '<div class="popup-desc">'+esc(mk.description)+'</div>' : '')+
+    '</div>'+
+    '<div class="popup-footer">'+
+      '<button class="popup-edit-btn" id="popupEditBtn">✏ Edit</button>'+
+      (linkedMap
+        ? '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1px;color:var(--gold);">→ '+esc(linkedMap.name)+'</span>'
+        : '<span class="popup-no-link-hint">No linked map</span>'
+      )+
+      '<button class="popup-close-btn" id="popupCloseBtn">✕</button>'+
+    '</div>';
+
+  // Position popup above the marker element in canvas space
+  popup.style.left=mk.x+'px';
+  popup.style.top=mk.y+'px';
+
+  document.getElementById('mapCanvas').appendChild(popup);
+
+  // Wire buttons
+  document.getElementById('popupCloseBtn').addEventListener('click',e=>{e.stopPropagation();closePopup();});
+  document.getElementById('popupEditBtn').addEventListener('click',e=>{e.stopPropagation();closePopup();openPanel(markerId);});
+
+  if(linkedMap){
+    const linkEl=document.getElementById('popupImgLink');
+    if(linkEl) linkEl.addEventListener('click',e=>{e.stopPropagation();navigateToMap(linkedMap.id);});
+  }
+}
+
+function closePopup(){
+  const p=document.getElementById('activePopup');
+  if(p) p.remove();
+  activePopupId=null;
+}
+
+// ── NAVIGATE TO LINKED MAP (replace current view, stay on page)
+async function navigateToMap(mapId){
+  closePopup(); closePanel();
+  // If map is in the sidebar list, just select it
+  const existing=maps.find(m=>m.id===mapId);
+  if(existing){
+    currentMapId=mapId;
+    try{ markers=await sbGet('markers','map_id=eq.'+mapId+'&order=created_at.asc'); }
+    catch(e){markers=[];}
+    renderSidebar();
+    await loadMapView(mapId);
+    return;
+  }
+  // Map might be in a different campaign — load it
+  try{
+    const rows=await sbGet('maps','id=eq.'+mapId);
+    if(!rows||!rows.length) return;
+    const m=rows[0];
+    // Switch campaign if needed
+    if(m.campaign_id!==currentCampaign){
+      currentCampaign=m.campaign_id;
+      document.getElementById('campaignSelect').value=currentCampaign;
+      await loadMapsForCampaign();
+    }
+    await selectMap(mapId);
+  }catch(e){alert('Could not load linked map: '+e.message);}
+}
+
+// ── EDIT PANEL
+function populateLinkedMapDropdown(currentLinkedId){
+  const sel=document.getElementById('panelLinkedMap');
+  sel.innerHTML='<option value="">— No linked map —</option>';
+  maps.filter(m=>m.id!==currentMapId).forEach(m=>{
+    const o=document.createElement('option');
+    o.value=m.id; o.textContent=m.icon+' '+m.name;
+    if(m.id===currentLinkedId) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function buildColorPicker(selected){
+  const cp=document.getElementById('colorPicker'); cp.innerHTML='';
+  MARKER_COLORS.forEach(c=>{
+    const s=document.createElement('div');
+    s.className='color-swatch'+(c===selected?' selected':'');
+    s.style.background=c; s.style.borderColor=c===selected?'white':'transparent';
+    s.addEventListener('click',()=>{
+      cp.querySelectorAll('.color-swatch').forEach(x=>{x.classList.remove('selected');x.style.borderColor='transparent';});
+      s.classList.add('selected'); s.style.borderColor='white'; selectedColor=c;
+    });
+    cp.appendChild(s);
+  });
+  selectedColor=selected;
+}
+
+async function openPanel(markerId){
+  const mk=markers.find(m=>m.id===markerId);
+  if(!mk)return;
+  activeMarkerId=markerId; pendingMarkerBlob=null;
+  document.getElementById('panelTitle').value=mk.title||'';
+  document.getElementById('panelDesc').value=mk.description||'';
+  buildColorPicker(mk.color||'#ff4422');
+  populateLinkedMapDropdown(mk.linked_map_id||null);
+  document.getElementById('btnDeleteMarker').style.display='block';
+  const preview=document.getElementById('panelImgPreview');
+  const label=document.getElementById('panelImgLabel');
+  const removeBtn=document.getElementById('panelImgRemove');
+  if(mk.image_url){
+    preview.src=mk.image_url+'?t='+Date.now(); preview.style.display='block';
+    label.style.display='none'; removeBtn.style.display='block';
+  } else {
+    preview.src=''; preview.style.display='none';
+    label.style.display='block'; removeBtn.style.display='none';
+  }
+  document.getElementById('markerPanel').classList.add('open');
+}
+
+function closePanel(){
+  document.getElementById('markerPanel').classList.remove('open');
+  activeMarkerId=null; pendingMarkerBlob=null;
+}
+document.getElementById('panelClose').addEventListener('click',closePanel);
+
+function handlePanelImage(file){
+  if(!file||!file.type.startsWith('image/'))return;
+  pendingMarkerBlob=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('panelImgPreview').src=e.target.result;
+    document.getElementById('panelImgPreview').style.display='block';
+    document.getElementById('panelImgLabel').style.display='none';
+    document.getElementById('panelImgRemove').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+document.getElementById('panelImgInput').addEventListener('change',function(){handlePanelImage(this.files[0]);});
+const pid=document.getElementById('panelImgDrop');
+pid.addEventListener('dragover',e=>{e.preventDefault();pid.classList.add('dragover');});
+pid.addEventListener('dragleave',()=>pid.classList.remove('dragover'));
+pid.addEventListener('drop',e=>{e.preventDefault();pid.classList.remove('dragover');handlePanelImage(e.dataTransfer.files[0]);});
+
+document.getElementById('panelImgRemove').addEventListener('click',async()=>{
+  const mk=markers.find(m=>m.id===activeMarkerId);
+  if(!mk)return;
+  try{
+    if(mk.image_url) await sbDeleteFile('marker-images/'+activeMarkerId);
+    await sbPatch('markers',activeMarkerId,{image_url:null});
+    mk.image_url=null;
+  }catch(e){console.warn(e);}
+  pendingMarkerBlob=null;
+  document.getElementById('panelImgPreview').style.display='none';
+  document.getElementById('panelImgLabel').style.display='block';
+  document.getElementById('panelImgRemove').style.display='none';
+});
+
+document.getElementById('btnSaveMarker').addEventListener('click',async()=>{
+  if(!activeMarkerId)return;
+  const mk=markers.find(m=>m.id===activeMarkerId);
+  if(!mk)return;
+  const btn=document.getElementById('btnSaveMarker');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    const title=document.getElementById('panelTitle').value.trim()||'Unnamed Marker';
+    const description=document.getElementById('panelDesc').value.trim();
+    const color=selectedColor;
+    const linked_map_id=document.getElementById('panelLinkedMap').value||null;
+    let image_url=mk.image_url||null;
+    if(pendingMarkerBlob){
+      const ext=pendingMarkerBlob.type.includes('png')?'png':'jpg';
+      image_url=await sbUpload('marker-images/'+activeMarkerId+'.'+ext,pendingMarkerBlob);
+      pendingMarkerBlob=null;
+    }
+    const rows=await sbPatch('markers',activeMarkerId,{title,description,color,image_url,linked_map_id});
+    const idx=markers.findIndex(m=>m.id===activeMarkerId);
+    if(idx!==-1) markers[idx]=rows[0];
+    renderMarkers(); renderSidebar(); closePanel();
+  }catch(e){alert('Could not save marker: '+e.message);}
+  finally{btn.disabled=false; btn.textContent='Save Marker';}
+});
+
+document.getElementById('btnDeleteMarker').addEventListener('click',async()=>{
+  if(!activeMarkerId||!confirm('Delete this marker?'))return;
+  try{
+    const mk=markers.find(m=>m.id===activeMarkerId);
+    if(mk?.image_url) try{await sbDeleteFile('marker-images/'+activeMarkerId);}catch{}
+    await sbDel('markers',activeMarkerId);
+    markers=markers.filter(m=>m.id!==activeMarkerId);
+    renderMarkers(); renderSidebar(); closePanel(); closePopup();
+  }catch(e){alert('Could not delete: '+e.message);}
+});
+
+// ── MAP IMAGE UPLOAD
+async function handleMapImageUpload(file){
+  if(!file||!currentMapId)return;
+  const btn=document.getElementById('btnReplaceImage');
+  if(btn)btn.disabled=true;
+  try{
+    const ext=file.type.includes('png')?'png':file.type.includes('webp')?'webp':'jpg';
+    const url=await sbUpload('maps/'+currentMapId+'.'+ext,file);
+    await sbPatch('maps',currentMapId,{image_url:url});
+    const map=maps.find(m=>m.id===currentMapId);
+    if(map) map.image_url=url;
+    await loadMapView(currentMapId);
+  }catch(e){alert('Upload failed: '+e.message);}
+  finally{if(btn)btn.disabled=false;}
+}
+document.getElementById('mapImageInput').addEventListener('change',function(){handleMapImageUpload(this.files[0]);});
+const upz=document.getElementById('mapUploadZone');
+upz.addEventListener('dragover',e=>{e.preventDefault();upz.classList.add('dragover');});
+upz.addEventListener('dragleave',()=>upz.classList.remove('dragover'));
+upz.addEventListener('drop',e=>{e.preventDefault();upz.classList.remove('dragover');handleMapImageUpload(e.dataTransfer.files[0]);});
+document.getElementById('btnReplaceImage').addEventListener('click',()=>document.getElementById('replaceImageInput').click());
+document.getElementById('replaceImageInput').addEventListener('change',function(){handleMapImageUpload(this.files[0]);});
+
+// ── NEW MAP MODAL
+let selectedMapIcon=MAP_ICONS[0];
+function buildIconPicker(){
+  const picker=document.getElementById('mapIconPicker'); picker.innerHTML='';
+  MAP_ICONS.forEach((ic,i)=>{
+    const btn=document.createElement('button');
+    btn.type='button'; btn.textContent=ic;
+    btn.className='icon-opt'+(i===0?' selected':'');
+    btn.addEventListener('click',()=>{picker.querySelectorAll('.icon-opt').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedMapIcon=ic;});
+    picker.appendChild(btn);
+  });
+  selectedMapIcon=MAP_ICONS[0];
+}
+function openNewMapModal(){if(!currentCampaign){alert('Select a campaign first.');return;}buildIconPicker();document.getElementById('newMapName').value='';document.getElementById('newMapOverlay').classList.add('open');document.getElementById('newMapName').focus();}
+function closeNewMapModal(){document.getElementById('newMapOverlay').classList.remove('open');}
+document.getElementById('btnNewMap').addEventListener('click',openNewMapModal);
+document.getElementById('newMapClose').addEventListener('click',closeNewMapModal);
+document.getElementById('newMapCancel').addEventListener('click',closeNewMapModal);
+document.getElementById('newMapOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('newMapOverlay'))closeNewMapModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeNewMapModal();closePanel();closePopup();}});
+
+document.getElementById('newMapSubmit').addEventListener('click',async()=>{
+  const name=document.getElementById('newMapName').value.trim();
+  if(!name){document.getElementById('newMapName').focus();return;}
+  const btn=document.getElementById('newMapSubmit');
+  btn.disabled=true; btn.textContent='Creating…';
+  try{
+    const rows=await sbPost('maps',{id:uid(),campaign_id:currentCampaign,name,icon:selectedMapIcon});
+    const newMap=rows[0];
+    maps.push(newMap);
+    closeNewMapModal();
+    renderSidebar();
+    await selectMap(newMap.id);
+  }catch(e){alert('Could not create map: '+e.message);}
+  finally{btn.disabled=false; btn.textContent='Create Map';}
+});
+
+// ── MOBILE
+document.getElementById('mobileBtn').addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('open'));
+document.getElementById('sidebarToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+// ── INIT
+(async function init(){
+  await populateCampaigns();
+  const params=new URLSearchParams(window.location.search);
+  const campName=params.get('campaign');
+  if(campName){
+    try{
+      const camps=await sbGet('campaigns','name=eq.'+encodeURIComponent(campName));
+      if(camps&&camps.length){
+        currentCampaign=camps[0].id;
+        document.getElementById('campaignSelect').value=camps[0].id;
+        document.title=campName+' Maps — Rougarole';
+        await loadMapsForCampaign();
+      }
+    }catch(e){console.error(e);}
+  }
+})();
+</script>
+</body>
+</html>

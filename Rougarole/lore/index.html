@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lore — Rougarole</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--surface:#0d0f1a;--surface2:#111425;--border:#2a2d45;--border-glow:#3d4170;
+  --text:#c8cce8;--text-dim:#6b7099;--text-bright:#e8ecff;--gold:#c9a84c;--gold-dim:#7a6430;
+  --gold-glow:rgba(201,168,76,.25);--anger:#cc2200;--anger-glow:#ff4422;--rune:#4a5080;--nav-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 7% 12%,rgba(200,204,232,.45) 0%,transparent 100%),
+    radial-gradient(1px 1px at 22% 58%,rgba(200,204,232,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 40% 8%,rgba(200,204,232,.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 60% 75%,rgba(200,204,232,.2) 0%,transparent 100%),
+    radial-gradient(1px 1px at 78% 22%,rgba(200,204,232,.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 92% 50%,rgba(200,204,232,.25) 0%,transparent 100%);}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(7,8,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:100;}
+nav::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);}
+.nav-brand{font-family:'Cinzel Decorative',serif;font-size:15px;color:var(--text-bright);letter-spacing:2px;text-decoration:none;display:flex;align-items:center;gap:10px;}
+.nav-brand .brand-rune{font-size:22px;opacity:.8;text-shadow:0 0 12px var(--anger-glow);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:7px 13px;border-radius:4px;border:1px solid transparent;transition:color .25s,border-color .25s,background .25s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.06);}
+.nav-mobile-btn{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px;}
+.nav-mobile-btn span{display:block;width:22px;height:1.5px;background:var(--text-dim);}
+.mobile-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:rgba(7,8,15,.97);border-bottom:1px solid var(--border);padding:20px 24px;z-index:99;flex-direction:column;gap:4px;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;padding:12px 8px;border-bottom:1px solid var(--border);transition:color .2s;}
+.mobile-menu a:last-child{border-bottom:none;}
+.mobile-menu a:hover{color:var(--gold);}
+
+/* ── PAGE HEADER ── */
+.page-header{position:relative;z-index:1;padding:calc(var(--nav-h) + 56px) 40px 48px;max-width:1200px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.page-header-text .page-eyebrow{font-family:'Cinzel',serif;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.page-eyebrow a{color:var(--text-dim);text-decoration:none;transition:color .2s;}
+.page-eyebrow a:hover{color:var(--gold);}
+.page-eyebrow .sep{color:var(--rune);margin:0 8px;}
+.page-title{font-family:'Cinzel Decorative',serif;font-size:clamp(24px,4vw,42px);font-weight:900;color:var(--text-bright);letter-spacing:2px;line-height:1.1;margin-bottom:8px;}
+.page-desc{font-size:15px;color:var(--text-dim);font-style:italic;max-width:480px;line-height:1.6;}
+.btn-new{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--bg);background:var(--gold);border:1px solid var(--gold);padding:13px 28px;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .25s,box-shadow .25s;display:flex;align-items:center;gap:8px;}
+.btn-new:hover{background:#e0ba56;box-shadow:0 0 20px rgba(201,168,76,.4);}
+.btn-new .plus{font-size:16px;font-family:'Crimson Pro',serif;font-weight:300;}
+.header-rule{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 40px;}
+.header-rule hr{border:none;border-top:1px solid var(--border-glow);margin-bottom:32px;}
+
+/* ── TOOLBAR: search + filters ── */
+.toolbar{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 40px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:200px;max-width:340px;}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:9px 14px 9px 36px;font-family:'Crimson Pro',serif;font-size:14px;color:var(--text);outline:none;transition:border-color .25s;}
+.search-wrap input::placeholder{color:var(--text-dim);}
+.search-wrap input:focus{border-color:var(--border-glow);}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-dim);pointer-events:none;}
+.filter-btn{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:9px 14px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;white-space:nowrap;}
+.filter-btn:hover{color:var(--text-bright);border-color:var(--border-glow);}
+.filter-btn.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.06);}
+.results-count{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--rune);margin-left:auto;}
+
+/* ── FILTER BAR ── */
+.filter-bar{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 40px 24px;display:flex;flex-direction:column;gap:10px;}
+.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-row-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);flex-shrink:0;min-width:68px;}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-chip{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 13px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;white-space:nowrap;}
+.filter-chip:hover{color:var(--text-bright);border-color:var(--border-glow);}
+.filter-chip.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.08);}
+
+/* ── LORE GRID ── */
+.lore-body{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 40px 100px;}
+
+/* Category group */
+.category-group{margin-bottom:52px;}
+.category-heading{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.category-heading-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.category-heading-line{flex:1;height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent);}
+
+.lore-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+
+/* Lore card */
+.lore-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .3s,box-shadow .3s,transform .3s;opacity:0;transform:translateY(16px);}
+.lore-card.visible{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease,border-color .3s,box-shadow .3s;}
+.lore-card:hover{border-color:rgba(201,168,76,.4);box-shadow:0 0 24px rgba(201,168,76,.08);transform:translateY(-3px);}
+.lore-card-img{width:100%;height:140px;object-fit:cover;display:block;border-bottom:1px solid var(--border);}
+.lore-card-body{padding:18px 20px 16px;}
+.lore-card-cat{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+.lore-card-title{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--text-bright);letter-spacing:.5px;margin-bottom:8px;line-height:1.3;}
+.lore-card-excerpt{font-size:13px;color:var(--text-dim);font-style:italic;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.lore-card-footer{padding:10px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
+.lore-card-date{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;color:var(--rune);}
+.lore-card-arrow{font-size:13px;color:var(--text-dim);opacity:0;transform:translateX(-4px);transition:opacity .2s,transform .2s;}
+.lore-card:hover .lore-card-arrow{opacity:1;transform:translateX(0);}
+
+/* Empty state */
+.empty-state{text-align:center;padding:80px 20px;}
+.empty-icon{font-size:48px;opacity:.15;display:block;margin-bottom:20px;}
+.empty-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;}
+.empty-body{font-size:14px;color:var(--rune);font-style:italic;}
+
+/* ── READER PANEL (full overlay) ── */
+.reader-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:stretch;opacity:0;pointer-events:none;transition:opacity .3s;}
+.reader-overlay.open{opacity:1;pointer-events:all;}
+.reader-backdrop{position:absolute;inset:0;background:rgba(4,5,10,.7);backdrop-filter:blur(4px);}
+.reader-panel{position:relative;margin-left:auto;width:100%;max-width:680px;background:var(--surface);border-left:1px solid var(--border-glow);display:flex;flex-direction:column;transform:translateX(40px);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.reader-overlay.open .reader-panel{transform:translateX(0);}
+.reader-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);z-index:1;}
+
+/* Reader header */
+.reader-head{flex-shrink:0;padding:24px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.reader-head-text{flex:1;}
+.reader-cat-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.reader-title{font-family:'Cinzel Decorative',serif;font-size:clamp(18px,3vw,26px);color:var(--text-bright);letter-spacing:1px;line-height:1.2;}
+.reader-close{background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:18px;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;flex-shrink:0;}
+.reader-close:hover{color:var(--text-bright);background:var(--surface2);}
+
+/* Reader actions */
+.reader-actions{flex-shrink:0;padding:10px 28px;border-bottom:1px solid var(--border);display:flex;gap:8px;}
+.reader-btn{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:4px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;}
+.reader-btn-edit{color:var(--text-dim);background:transparent;border:1px solid var(--border);} 
+.reader-btn-edit:hover{color:var(--gold);border-color:var(--gold-dim);}
+.reader-btn-delete{color:rgba(255,68,34,.5);background:transparent;border:1px solid rgba(255,68,34,.2);}
+.reader-btn-delete:hover{color:var(--anger-glow);border-color:rgba(255,68,34,.5);background:rgba(204,34,0,.06);}
+
+/* Reader body — scrollable */
+.reader-body{flex:1;overflow-y:auto;padding:28px;}
+.reader-body::-webkit-scrollbar{width:5px;}
+.reader-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.reader-img{width:100%;max-height:280px;object-fit:cover;border-radius:6px;margin-bottom:28px;display:block;border:1px solid var(--border);}
+.reader-content{font-size:16px;color:var(--text);line-height:1.85;white-space:pre-wrap;font-family:'Crimson Pro',serif;}
+.reader-meta{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--rune);}
+
+/* ── MODAL (create/edit) ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,5,10,.88);backdrop-filter:blur(6px);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border-glow);border-radius:10px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(16px) scale(.98);transition:transform .25s;}
+.modal-overlay.open .modal{transform:none;}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.modal-header{padding:26px 26px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-eyebrow{font-family:'Cinzel',serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.modal-title{font-family:'Cinzel Decorative',serif;font-size:19px;color:var(--text-bright);}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:17px;color:var(--text-dim);width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;}
+.modal-close:hover{color:var(--text-bright);background:var(--surface2);}
+.modal-body{padding:22px 26px;}
+.field{margin-bottom:18px;}
+.field-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
+.field-input,.field-select,.field-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 13px;font-family:'Crimson Pro',serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s;}
+.field-input:focus,.field-select:focus,.field-textarea:focus{border-color:var(--gold-dim);}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--rune);}
+.field-textarea{resize:vertical;min-height:220px;line-height:1.7;}
+.field-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7099'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer;}
+.field-select option{background:var(--surface2);color:var(--text);}
+
+/* Image upload in modal */
+.img-drop{width:100%;background:var(--surface2);border:1px dashed var(--border-glow);border-radius:4px;padding:22px;text-align:center;cursor:pointer;position:relative;transition:border-color .2s,background .2s;}
+.img-drop:hover,.img-drop.dragover{border-color:var(--gold-dim);background:rgba(201,168,76,.04);}
+.img-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.img-drop-preview{width:100%;max-height:160px;object-fit:cover;border-radius:4px;margin-bottom:8px;display:none;}
+.img-drop-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);}
+.img-drop-remove{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,68,34,.5);background:none;border:none;cursor:pointer;display:none;margin-top:6px;transition:color .2s;}
+.img-drop-remove:hover{color:var(--anger-glow);}
+
+/* Custom category input */
+.field-row{display:flex;gap:10px;}
+.field-row .field-select{flex:1;}
+.field-row .field-input{flex:1;}
+
+.modal-footer{padding:8px 26px 22px;display:flex;gap:8px;justify-content:flex-end;}
+.btn-cancel{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:10px 20px;border-radius:4px;cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-cancel:hover{border-color:var(--text-dim);color:var(--text);}
+.btn-submit{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);border:1px solid var(--gold);padding:10px 24px;border-radius:4px;cursor:pointer;transition:background .2s,box-shadow .2s;}
+.btn-submit:hover{background:#e0ba56;box-shadow:0 0 14px rgba(201,168,76,.3);}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:32px 40px;text-align:center;}
+footer::before{content:'';display:block;width:40%;height:1px;background:linear-gradient(90deg,transparent,var(--anger-glow),transparent);margin:-32px auto 30px;}
+.footer-copy{font-size:12px;color:var(--rune);font-style:italic;}
+
+@media(max-width:780px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .nav-mobile-btn{display:flex;}
+  .page-header,.header-rule,.toolbar,.filter-bar,.lore-body{padding-left:20px;padding-right:20px;}
+  .reader-panel{max-width:100%;border-left:none;border-top:1px solid var(--border-glow);}
+  .lore-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../" class="nav-brand"><span class="brand-rune">⚔</span>Rougarole</a>
+  <ul class="nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../characters/">Characters</a></li>
+    <li><a href="../maps/">Maps</a></li>
+    <li><a href="../lore/" class="active">Lore</a></li>
+  </ul>
+  <button class="nav-mobile-btn" id="mobileBtn"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../">Home</a>
+  <a href="../characters/">Characters</a>
+  <a href="../maps/">Maps</a>
+  <a href="../lore/">Lore</a>
+</div>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+  <div class="page-header-text">
+    <p class="page-eyebrow">
+      <a href="../">Rougarole</a>
+      <span class="sep">›</span>
+      <span id="breadcrumbCampaign"></span>
+      Lore Books
+    </p>
+    <h1 class="page-title">Lore Books</h1>
+    <p class="page-desc">Histories, myths, and recovered texts from across the known world.</p>
+  </div>
+  <button class="btn-new" id="openModal"><span class="plus">+</span> New Entry</button>
+</header>
+
+<div class="header-rule"><hr></div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search lore…">
+  </div>
+  <span class="results-count" id="resultsCount"></span>
+</div>
+<div class="filter-bar" id="filterBar">
+  <div class="filter-row">
+    <span class="filter-row-label">Campaign</span>
+    <div class="filter-chips" id="campaignFilters"></div>
+  </div>
+  <div class="filter-row">
+    <span class="filter-row-label">Category</span>
+    <div class="filter-chips" id="categoryFilters"></div>
+  </div>
+</div>
+
+<!-- LORE BODY -->
+<main class="lore-body" id="loreBody">
+  <!-- populated by JS -->
+</main>
+
+<footer>
+  <p class="footer-copy">Archives of the Whittington Guard &bull; All records are living documents.</p>
+</footer>
+
+<!-- READER PANEL -->
+<div class="reader-overlay" id="readerOverlay">
+  <div class="reader-backdrop" id="readerBackdrop"></div>
+  <div class="reader-panel">
+    <div class="reader-head">
+      <div class="reader-head-text">
+        <div class="reader-cat-badge" id="readerCat"></div>
+        <h2 class="reader-title" id="readerTitle"></h2>
+      </div>
+      <button class="reader-close" id="readerClose">✕</button>
+    </div>
+    <div class="reader-actions">
+      <button class="reader-btn reader-btn-edit" id="readerEdit">✏ Edit</button>
+      <button class="reader-btn reader-btn-delete" id="readerDelete">Delete Entry</button>
+    </div>
+    <div class="reader-body">
+      <img class="reader-img" id="readerImg" src="" alt="" style="display:none;">
+      <div class="reader-content" id="readerContent"></div>
+      <div class="reader-meta" id="readerMeta"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE / EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <p class="modal-eyebrow" id="modalEyebrow">New Entry</p>
+      <h2 class="modal-title" id="modalTitle">Add Lore</h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="entryTitle">Title</label>
+        <input class="field-input" type="text" id="entryTitle" placeholder="e.g. The Sundering of Keth" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field-label">Category</label>
+        <div class="field-row">
+          <select class="field-select" id="entryCategory">
+            <option value="">— Select or type new —</option>
+            <option value="Creatures">Creatures</option>
+            <option value="Items">Items</option>
+            <option value="Notable Figures">Notable Figures</option>
+            <option value="Mythology">Mythology</option>
+            <option value="Factions">Factions</option>
+            <option value="Locations">Locations</option>
+            <option value="Other">Other</option>
+          </select>
+          <input class="field-input" type="text" id="entryCategoryCustom" placeholder="Or type a custom category…">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="entryBody">Body</label>
+        <textarea class="field-textarea" id="entryBody" placeholder="Write the lore entry here…"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Image (optional)</label>
+        <div class="img-drop" id="imgDrop">
+          <input type="file" id="imgInput" accept="image/*">
+          <img class="img-drop-preview" id="imgPreview" src="" alt="">
+          <span class="img-drop-label" id="imgDropLabel">Drop image or click to upload</span>
+        </div>
+        <button class="img-drop-remove" id="imgRemove">✕ Remove image</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="modalCancel">Cancel</button>
+      <button class="btn-submit" id="modalSubmit">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Supabase
+const SB_URL='https://wzesjwjbecmxliwiialj.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6ZXNqd2piZWNteGxpd2lpYWxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTkxNTcsImV4cCI6MjA5NTQzNTE1N30.mGjoDfO_fzRPp9_rPxG7bJ0xfC4oHF0kY0Ka05TmgBc';
+const HDR={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+const STORAGE_HDR={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+async function sbGet(t,q=''){const r=await fetch(SB_URL+'/rest/v1/'+t+'?'+q,{headers:{...HDR,'Accept':'application/json'}});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbPost(t,d){const r=await fetch(SB_URL+'/rest/v1/'+t,{method:'POST',headers:{...HDR,'Prefer':'return=representation'},body:JSON.stringify(d)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbPatch(t,id,d){const r=await fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+id,{method:'PATCH',headers:{...HDR,'Prefer':'return=representation'},body:JSON.stringify(d)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbDel(t,id){const r=await fetch(SB_URL+'/rest/v1/'+t+'?id=eq.'+id,{method:'DELETE',headers:HDR});if(!r.ok)throw new Error(await r.text());}
+async function sbUpload(path,blob){const r=await fetch(SB_URL+'/storage/v1/object/rougarole/'+path,{method:'POST',headers:{...STORAGE_HDR,'Content-Type':blob.type||'application/octet-stream','x-upsert':'true'},body:blob});if(!r.ok)throw new Error(await r.text());return SB_URL+'/storage/v1/object/public/rougarole/'+path;}
+async function sbDeleteFile(path){await fetch(SB_URL+'/storage/v1/object/rougarole/'+path,{method:'DELETE',headers:STORAGE_HDR});}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── STATE
+let allEntries    = [];
+let allCampaigns  = [];
+let campaignName  = '';   // pre-filter from URL param
+let activeCampaigns = new Set(['All']);  // 'All' means no filter
+let activeCategories = new Set(['All']); // 'All' means no filter
+let editingId     = null;
+let pendingImgBlob = null;
+
+// ── INIT
+(async function init(){
+  const params = new URLSearchParams(window.location.search);
+  const camp   = params.get('campaign');
+  if(camp){
+    campaignName = camp;
+    activeCampaigns = new Set([camp]); // pre-select this campaign
+    const bc = document.getElementById('breadcrumbCampaign');
+    if(bc) bc.innerHTML = esc(camp) + ' <span class="sep" style="color:var(--rune);margin:0 8px;">›</span> ';
+    document.title = camp + ' Lore — Rougarole';
+  }
+  // Load campaigns for filter bar
+  try{ allCampaigns = await sbGet('campaigns','order=created_at.asc'); }
+  catch(e){ allCampaigns = []; }
+  await loadEntries();
+})();
+
+async function loadEntries(){
+  try{
+    allEntries = await sbGet('lore_entries','order=created_at.desc');
+  }catch(e){
+    console.error('Could not load lore:', e);
+    allEntries = [];
+  }
+  renderAll();
+}
+
+// ── RENDER
+function buildFilterBars(){
+  // Campaign chips
+  const campWrap = document.getElementById('campaignFilters');
+  campWrap.innerHTML = '';
+  const campNames = ['All', ...allCampaigns.map(c=>c.name)];
+  campNames.forEach(name => {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip' + (activeCampaigns.has(name) ? ' active' : '');
+    chip.textContent = name;
+    chip.addEventListener('click', () => {
+      if(name === 'All'){
+        activeCampaigns = new Set(['All']);
+      } else {
+        activeCampaigns.delete('All');
+        if(activeCampaigns.has(name)) activeCampaigns.delete(name);
+        else activeCampaigns.add(name);
+        if(activeCampaigns.size === 0) activeCampaigns = new Set(['All']);
+      }
+      renderAll();
+    });
+    campWrap.appendChild(chip);
+  });
+
+  // Category chips — built from entries present
+  const catWrap = document.getElementById('categoryFilters');
+  catWrap.innerHTML = '';
+  const cats = ['All', ...new Set(allEntries.map(e=>e.category).filter(Boolean).sort())];
+  cats.forEach(cat => {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip' + (activeCategories.has(cat) ? ' active' : '');
+    chip.textContent = cat;
+    chip.addEventListener('click', () => {
+      if(cat === 'All'){
+        activeCategories = new Set(['All']);
+      } else {
+        activeCategories.delete('All');
+        if(activeCategories.has(cat)) activeCategories.delete(cat);
+        else activeCategories.add(cat);
+        if(activeCategories.size === 0) activeCategories = new Set(['All']);
+      }
+      renderAll();
+    });
+    catWrap.appendChild(chip);
+  });
+}
+
+function renderAll(){
+  buildFilterBars();
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const filtered = allEntries.filter(e => {
+    const matchCamp = activeCampaigns.has('All') || activeCampaigns.has(e.campaign||'');
+    const matchCat  = activeCategories.has('All') || activeCategories.has(e.category||'');
+    const matchSearch = !q ||
+      (e.title||'').toLowerCase().includes(q) ||
+      (e.body||'').toLowerCase().includes(q) ||
+      (e.category||'').toLowerCase().includes(q);
+    return matchCamp && matchCat && matchSearch;
+  });
+
+  const body  = document.getElementById('loreBody');
+  const count = document.getElementById('resultsCount');
+  body.innerHTML = '';
+  count.textContent = filtered.length ? filtered.length + ' entr' + (filtered.length === 1 ? 'y' : 'ies') : '';
+
+  if(!filtered.length){
+    body.innerHTML =
+      '<div class="empty-state">' +
+        '<span class="empty-icon">📜</span>' +
+        '<p class="empty-title">' + (allEntries.length ? 'No matches found' : 'No lore entries yet') + '</p>' +
+        '<p class="empty-body">' + (allEntries.length ? 'Try a different search or category.' : 'Add the first entry using the button above.') + '</p>' +
+      '</div>';
+    return;
+  }
+
+  // Group by category
+  const groups = {};
+  filtered.forEach(e => {
+    const cat = e.category || 'Uncategorised';
+    if(!groups[cat]) groups[cat] = [];
+    groups[cat].push(e);
+  });
+
+  // Show category group headers only when not filtering by a specific category
+  const showHeaders = activeCategories.has('All') && !q;
+
+  Object.keys(groups).sort().forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'category-group';
+    if(showHeaders){
+      section.innerHTML =
+        '<div class="category-heading">' +
+          '<span class="category-heading-label">' + esc(cat) + '</span>' +
+          '<div class="category-heading-line"></div>' +
+        '</div>';
+    }
+    const grid = document.createElement('div');
+    grid.className = 'lore-grid';
+    groups[cat].forEach((e, i) => {
+      const card = document.createElement('div');
+      card.className = 'lore-card';
+      card.dataset.id = e.id;
+      const date = new Date(e.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+      const excerpt = (e.body||'').slice(0,180).replace(/\n/g,' ');
+      card.innerHTML =
+        (e.image_url ? '<img class="lore-card-img" src="'+esc(e.image_url)+'?t=1" alt="">' : '') +
+        '<div class="lore-card-body">' +
+          '<div class="lore-card-cat">' + esc(e.category||'Uncategorised') + '</div>' +
+          '<div class="lore-card-title">' + esc(e.title||'Untitled') + '</div>' +
+          '<div class="lore-card-excerpt">' + esc(excerpt) + (e.body&&e.body.length>180?'…':'') + '</div>' +
+        '</div>' +
+        '<div class="lore-card-footer">' +
+          '<span class="lore-card-date">' + date + '</span>' +
+          '<span class="lore-card-arrow">→</span>' +
+        '</div>';
+      card.addEventListener('click', () => openReader(e.id));
+      grid.appendChild(card);
+      setTimeout(() => card.classList.add('visible'), i * 50);
+    });
+    section.appendChild(grid);
+    body.appendChild(section);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', renderAll);
+
+// ── READER
+function openReader(id){
+  const e = allEntries.find(x => x.id === id);
+  if(!e) return;
+  document.getElementById('readerCat').textContent   = e.category || 'Uncategorised';
+  document.getElementById('readerTitle').textContent = e.title    || 'Untitled';
+  document.getElementById('readerContent').textContent = e.body   || '';
+  const img = document.getElementById('readerImg');
+  if(e.image_url){ img.src=e.image_url+'?t=1'; img.style.display='block'; }
+  else { img.src=''; img.style.display='none'; }
+  const date = new Date(e.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('readerMeta').textContent = 'Added ' + date + (campaignName ? ' · ' + campaignName : '');
+  document.getElementById('readerOverlay').classList.add('open');
+  // Store active id for edit/delete
+  document.getElementById('readerOverlay').dataset.activeId = id;
+}
+
+function closeReader(){
+  document.getElementById('readerOverlay').classList.remove('open');
+}
+
+document.getElementById('readerClose').addEventListener('click', closeReader);
+document.getElementById('readerBackdrop').addEventListener('click', closeReader);
+
+document.getElementById('readerEdit').addEventListener('click', () => {
+  const id = document.getElementById('readerOverlay').dataset.activeId;
+  closeReader();
+  openModal(id);
+});
+
+document.getElementById('readerDelete').addEventListener('click', async () => {
+  const id = document.getElementById('readerOverlay').dataset.activeId;
+  const e  = allEntries.find(x => x.id === id);
+  if(!e || !confirm('Delete "' + e.title + '"? This cannot be undone.')) return;
+  try{
+    if(e.image_url) try{ await sbDeleteFile('lore-images/'+id); }catch{}
+    await sbDel('lore_entries', id);
+    allEntries = allEntries.filter(x => x.id !== id);
+    closeReader();
+    renderAll();
+  }catch(err){ alert('Could not delete: ' + err.message); }
+});
+
+// ── MODAL
+function openModal(editId){
+  editingId = editId || null;
+  pendingImgBlob = null;
+  const isEdit = !!editId;
+  document.getElementById('modalEyebrow').textContent = isEdit ? 'Edit Entry' : 'New Entry';
+  document.getElementById('modalTitle').textContent   = isEdit ? 'Edit Lore'  : 'Add Lore';
+  document.getElementById('modalSubmit').textContent  = isEdit ? 'Save Changes' : 'Save Entry';
+
+  // Clear form
+  document.getElementById('entryTitle').value          = '';
+  document.getElementById('entryCategory').value       = '';
+  document.getElementById('entryCategoryCustom').value = '';
+  document.getElementById('entryBody').value           = '';
+  document.getElementById('imgPreview').style.display  = 'none';
+  document.getElementById('imgPreview').src            = '';
+  document.getElementById('imgDropLabel').style.display = 'block';
+  document.getElementById('imgRemove').style.display   = 'none';
+
+  if(isEdit){
+    const e = allEntries.find(x => x.id === editId);
+    if(e){
+      document.getElementById('entryTitle').value = e.title || '';
+      document.getElementById('entryBody').value  = e.body  || '';
+      // Set category — try dropdown first, else custom
+      const sel = document.getElementById('entryCategory');
+      const opts = Array.from(sel.options).map(o=>o.value);
+      if(opts.includes(e.category)){
+        sel.value = e.category;
+      } else {
+        sel.value = '';
+        document.getElementById('entryCategoryCustom').value = e.category || '';
+      }
+      if(e.image_url){
+        document.getElementById('imgPreview').src          = e.image_url+'?t=1';
+        document.getElementById('imgPreview').style.display = 'block';
+        document.getElementById('imgDropLabel').style.display = 'none';
+        document.getElementById('imgRemove').style.display = 'block';
+      }
+    }
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('entryTitle').focus();
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+  pendingImgBlob = null;
+}
+
+document.getElementById('openModal').addEventListener('click',  () => openModal());
+document.getElementById('modalClose').addEventListener('click',  closeModal);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===document.getElementById('modalOverlay')) closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); closeReader(); }});
+
+// Image handling
+function handleImg(file){
+  if(!file||!file.type.startsWith('image/')) return;
+  pendingImgBlob = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('imgPreview').src = ev.target.result;
+    document.getElementById('imgPreview').style.display = 'block';
+    document.getElementById('imgDropLabel').style.display = 'none';
+    document.getElementById('imgRemove').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+document.getElementById('imgInput').addEventListener('change', function(){ handleImg(this.files[0]); });
+const imgDrop = document.getElementById('imgDrop');
+imgDrop.addEventListener('dragover',  e => { e.preventDefault(); imgDrop.classList.add('dragover'); });
+imgDrop.addEventListener('dragleave', () => imgDrop.classList.remove('dragover'));
+imgDrop.addEventListener('drop',      e => { e.preventDefault(); imgDrop.classList.remove('dragover'); handleImg(e.dataTransfer.files[0]); });
+document.getElementById('imgRemove').addEventListener('click', () => {
+  pendingImgBlob = null;
+  // Mark image as removed (we'll handle on save)
+  document.getElementById('imgRemove').dataset.removed = 'true';
+  document.getElementById('imgPreview').style.display  = 'none';
+  document.getElementById('imgPreview').src            = '';
+  document.getElementById('imgDropLabel').style.display = 'block';
+  document.getElementById('imgRemove').style.display   = 'none';
+});
+
+// Submit
+document.getElementById('modalSubmit').addEventListener('click', async () => {
+  const title = document.getElementById('entryTitle').value.trim();
+  if(!title){ document.getElementById('entryTitle').focus(); return; }
+
+  // Category: prefer custom if filled, else dropdown
+  const custom = document.getElementById('entryCategoryCustom').value.trim();
+  const category = custom || document.getElementById('entryCategory').value || 'Other';
+  const body = document.getElementById('entryBody').value.trim();
+
+  const btn = document.getElementById('modalSubmit');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try{
+    const id = editingId || uid();
+    let image_url = null;
+
+    // Handle existing image
+    if(editingId){
+      const existing = allEntries.find(x=>x.id===editingId);
+      image_url = existing?.image_url || null;
+      // If removed
+      if(document.getElementById('imgRemove').dataset.removed === 'true'){
+        if(image_url) try{ await sbDeleteFile('lore-images/'+editingId); }catch{}
+        image_url = null;
+        document.getElementById('imgRemove').dataset.removed = '';
+      }
+    }
+
+    // Upload new image if pending
+    if(pendingImgBlob){
+      const ext = pendingImgBlob.type.includes('png') ? 'png' : pendingImgBlob.type.includes('webp') ? 'webp' : 'jpg';
+      image_url = await sbUpload('lore-images/'+id+'.'+ext, pendingImgBlob);
+    }
+
+    const payload = { id, title, category, body, image_url, campaign: campaignName||null };
+
+    let row;
+    if(editingId){
+      const rows = await sbPatch('lore_entries', editingId, {title, category, body, image_url});
+      row = rows[0];
+      allEntries = allEntries.map(x => x.id === editingId ? row : x);
+    } else {
+      const rows = await sbPost('lore_entries', payload);
+      row = rows[0];
+      allEntries.unshift(row);
+    }
+
+    closeModal();
+    renderAll();
+  }catch(err){
+    alert('Could not save: ' + err.message);
+    console.error(err);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = editingId ? 'Save Changes' : 'Save Entry';
+  }
+});
+
+// Mobile nav
+document.getElementById('mobileBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+</script>
+</body>
+</html>
